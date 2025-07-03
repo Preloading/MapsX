@@ -142,7 +142,6 @@ NSURL *addAccessKeyToURL(NSURL *originalURL) {
 %hook NSURLRequest
 
 - (instancetype)initWithURL:(NSURL *)URL cachePolicy:(NSURLRequestCachePolicy)cachePolicy timeoutInterval:(NSTimeInterval)timeoutInterval {
-    NSLog(@"[MapsX] Rewriting URLs");
     //  URL Rewrites
     NSString *newURLString = [[URL absoluteString] stringByReplacingOccurrencesOfString:@"gspa35-ssl.ls.apple.com" withString:@"gspe35-ssl.ls.apple.com"];
     newURLString = [newURLString stringByReplacingOccurrencesOfString:@"gspa11.ls.apple.com" withString:@"gspe11-ssl.ls.apple.com"];
