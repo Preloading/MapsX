@@ -167,93 +167,8 @@ NSURL *addAccessKeyToURL(NSURL *originalURL) {
 
 %hook NSURLConnection
 
-+ (NSData *) sendSynchronousRequest:(NSURLRequest *) request returningResponse:(NSURLResponse * *) response error:(NSError * *) error {
-    NSURL *originalURL = [request URL];
-    NSString *urlString = [originalURL absoluteString];
-
-    // Log original URL for debugging
-    NSLog(@"[MapsX] Original URL: %@", urlString);
-
-    if (!(
-         ([[originalURL host] isEqualToString:@"gspe11-ssl.ls.apple.com"]) || 
-         ([[originalURL host] isEqualToString:@"gspe11.ls.apple.com"]) || 
-         ([[originalURL host] isEqualToString:@"gspe19.ls.apple.com"]) || 
-         ([[originalURL host] isEqualToString:@"gspe12.ls.apple.com"]))) {
-        return %orig(request, response, error);
-    }
-    
-    // Use the helper function to add the accessKey parameter
-    NSURL *newURL = addAccessKeyToURL(originalURL);
-    
-    // Create a mutable copy of the request and set the new URL
-    NSMutableURLRequest *modifiedRequest = [request mutableCopy];
-    [modifiedRequest setURL:newURL];
-    
-    // Log modified URL for verification
-    NSLog(@"Modified URL: %@", [newURL absoluteString]);
-    
-    // Call original implementation with modified request
-    return %orig(modifiedRequest, response, error);
-}
-
-+ (NSURLConnection *)connectionWithRequest:(NSURLRequest *)request delegate:(id)delegate {
-    NSURL *originalURL = [request URL];
-    NSString *urlString = [originalURL absoluteString];
-    
-    NSLog(@"Original URL (connectionWithRequest): %@", urlString);
-    
-    if (!(
-         ([[originalURL host] isEqualToString:@"gspe11-ssl.ls.apple.com"]) || 
-         ([[originalURL host] isEqualToString:@"gspe11.ls.apple.com"]) || 
-         ([[originalURL host] isEqualToString:@"gspe19.ls.apple.com"]) || 
-         ([[originalURL host] isEqualToString:@"gspe12.ls.apple.com"]))) {
-        return %orig(request, delegate);
-    }
-    
-    // Use the helper function to add the accessKey parameter
-    NSURL *newURL = addAccessKeyToURL(originalURL);
-    
-    // Create a mutable copy of the request and set the new URL
-    NSMutableURLRequest *modifiedRequest = [request mutableCopy];
-    [modifiedRequest setURL:newURL];
-    
-    NSLog(@"Modified URL (connectionWithRequest): %@", [newURL absoluteString]);
-    
-    return %orig(modifiedRequest, delegate);
-}
-
-- (instancetype)initWithRequest:(NSURLRequest *)request delegate:(id)delegate {
-    NSURL *originalURL = [request URL];
-    NSString *urlString = [originalURL absoluteString];
-    
-    NSLog(@"Original URL (initWithRequest:delegate:): %@", urlString);
-    
-    if (!(
-         ([[originalURL host] isEqualToString:@"gspe11-ssl.ls.apple.com"]) || 
-         ([[originalURL host] isEqualToString:@"gspe11.ls.apple.com"]) || 
-         ([[originalURL host] isEqualToString:@"gspe19.ls.apple.com"]) || 
-         ([[originalURL host] isEqualToString:@"gspe12.ls.apple.com"]))) {
-        return %orig(request, delegate);
-    }
-    
-    // Use the helper function to add the accessKey parameter
-    NSURL *newURL = addAccessKeyToURL(originalURL);
-    
-    // Create a mutable copy of the request and set the new URL
-    NSMutableURLRequest *modifiedRequest = [request mutableCopy];
-    [modifiedRequest setURL:newURL];
-    
-    NSLog(@"Modified URL (initWithRequest:delegate:): %@", [newURL absoluteString]);
-    
-    return %orig(modifiedRequest, delegate);
-}
-
 - (instancetype)initWithRequest:(NSURLRequest *)request delegate:(id)delegate startImmediately:(BOOL)startImmediately {
     NSURL *originalURL = [request URL];
-    NSString *urlString = [originalURL absoluteString];
-    
-    NSLog(@"Original URL (initWithRequest:delegate:startImmediately:): %@", urlString);
-    
     if (!(
          ([[originalURL host] isEqualToString:@"gspe11-ssl.ls.apple.com"]) || 
          ([[originalURL host] isEqualToString:@"gspe11.ls.apple.com"]) || 
@@ -261,6 +176,10 @@ NSURL *addAccessKeyToURL(NSURL *originalURL) {
          ([[originalURL host] isEqualToString:@"gspe12.ls.apple.com"]))) {
         return %orig(request, delegate, startImmediately);
     }
+
+    NSString *urlString = [originalURL absoluteString];
+    
+    NSLog(@"Original URL (initWithRequest:delegate:startImmediately:): %@", urlString);
     
     // Use the helper function to add the accessKey parameter
     NSURL *newURL = addAccessKeyToURL(originalURL);
@@ -272,33 +191,6 @@ NSURL *addAccessKeyToURL(NSURL *originalURL) {
     NSLog(@"Modified URL (initWithRequest:delegate:startImmediately:): %@", [newURL absoluteString]);
     
     return %orig(modifiedRequest, delegate, startImmediately);
-}
-
-+ (void)sendAsynchronousRequest:(NSURLRequest *)request queue:(NSOperationQueue *)queue completionHandler:(void (^)(NSURLResponse *response, NSData *data, NSError *connectionError))handler {
-    NSURL *originalURL = [request URL];
-    NSString *urlString = [originalURL absoluteString];
-    
-    NSLog(@"Original URL (sendAsynchronousRequest): %@", urlString);
-    
-    if (!(
-         ([[originalURL host] isEqualToString:@"gspe11-ssl.ls.apple.com"]) || 
-         ([[originalURL host] isEqualToString:@"gspe11.ls.apple.com"]) || 
-         ([[originalURL host] isEqualToString:@"gspe19.ls.apple.com"]) || 
-         ([[originalURL host] isEqualToString:@"gspe12.ls.apple.com"]))) {
-        %orig(request, queue, handler);
-        return;
-    }
-    
-    // Use the helper function to add the accessKey parameter
-    NSURL *newURL = addAccessKeyToURL(originalURL);
-    
-    // Create a mutable copy of the request and set the new URL
-    NSMutableURLRequest *modifiedRequest = [request mutableCopy];
-    [modifiedRequest setURL:newURL];
-    
-    NSLog(@"Modified URL (sendAsynchronousRequest): %@", [newURL absoluteString]);
-    
-    %orig(modifiedRequest, queue, handler);
 }
 
 %end
