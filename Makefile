@@ -9,5 +9,7 @@ TWEAK_NAME = MapsX
 
 MapsX_FILES = Tweak.x TokenManager.m
 MapsX_CFLAGS = -fobjc-arc
+MapsX_FRAMEWORKS = Foundation CoreFoundation
+MapsX_PRIVATE_FRAMEWORKS = ProtocolBuffer
 
 include $(THEOS_MAKE_PATH)/tweak.mk

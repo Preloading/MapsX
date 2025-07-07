@@ -2,6 +2,10 @@
 #import <CoreFoundation/CoreFoundation.h>
 #import "TokenManager.h"
 
+@interface PBDataWriter : NSObject
+- (void)writeInt32:(int)value forTag:(int)tag;
+@end
+
 // Hell. You may be wondering why is this nessiary?
 // well stringByAddingPercentEscapesUsingEncoding doesn't encode = for the query params :)
 NSString *customURLEncode(NSString *string) {
@@ -190,6 +194,21 @@ NSURL *addAccessKeyToURL(NSURL *originalURL) {
     NSLog(@"Modified URL (initWithRequest:delegate:startImmediately:): %@", [newURL absoluteString]);
     
     return %orig(modifiedRequest, delegate, startImmediately);
+}
+
+%end
+
+%hook GEODirectionsRequest
+
+-(void)writeTo:(id)writer {
+    NSLog(@"[MapsX] GEODirectionsRequest.writeTo called!");
+    if ([writer isKindOfClass:[PBDataWriter class]]) {
+        [writer writeInt32:64 forTag:1];
+    } else {
+        // panik
+        return %orig
+    }
+    return;
 }
 
 %end
