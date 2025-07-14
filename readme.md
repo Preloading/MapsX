@@ -10,6 +10,6 @@ Download and install the tweak from my Cydia repo:
 https://cydia.skyglow.es
 
 ### Contributors
-ObscureMosquito/Requis/Me: made the tweak
-Preloading: Updated it to use the new method!
-Pod: Discovered the new method!
+- **ObscureMosquito/Requis/Me**: Made the tweak
+- **Preloading**: Updated it to use the new method!
+- **Pod**: Discovered the new method!
