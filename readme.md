@@ -8,3 +8,8 @@ Simple Cydia Tweak that will fix any Apple MapView instance in the system for io
 ## Usage
 Download and install the tweak from my Cydia repo:
 https://cydia.skyglow.es
+
+### Contributors
+ObscureMosquito/Requis/Me: made the tweak
+Preloading: Updated it to use the new method!
+Pod: Discovered the new method!
