@@ -7,7 +7,7 @@ include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = MapsX
 
-MapsX_FILES = Tweak.x
+MapsX_FILES = Tweak.x TokenManager.m
 MapsX_CFLAGS = -fobjc-arc
 
 include $(THEOS_MAKE_PATH)/tweak.mk
