@@ -1,10 +1,368 @@
 #import <Foundation/Foundation.h>
 #import <CoreFoundation/CoreFoundation.h>
 #import "TokenManager.h"
+#import <execinfo.h>
 
 @interface PBDataWriter : NSObject
-- (void)writeInt32:(int)value forTag:(int)tag;
+-(void)writeDouble:(double)value forTag:(unsigned short)tag ;
+-(void)writeUint64:(unsigned long long)value forTag:(unsigned short)tag ;
+-(void)writeSfixed32:(int)value forTag:(unsigned short)tag ;
+-(void)writeInt64:(long long)value forTag:(unsigned short)tag ;
+-(void)writeBigEndianFixed16:(unsigned short)value ;
+-(void)writeUint8:(unsigned char)value ;
+-(void)writeBigEndianFixed32:(unsigned)value ;
+-(void)writeBigEndianShortThenString:(id)value ;
+-(void)writeProtoBuffer:(id)value ;
+-(void)writeInt8:(char)value ;
+-(void)writeSint64:(long long)value forTag:(unsigned short)tag ;
+-(void)writeFixed64:(unsigned long long)value forTag:(unsigned short)tag ;
+-(void)writeSfixed64:(long long)value forTag:(unsigned short)tag ;
+-(void)writeData:(id)value forTag:(unsigned short)tag ;
+-(void)writeUint32:(unsigned)value forTag:(unsigned short)tag ;
+-(void)writeTag:(unsigned short)value andType:(unsigned char)tag ;
+-(void)writeBareVarint:(unsigned long long)value ;
+-(void)writeString:(id)value forTag:(unsigned short)tag ;
+-(void)writeBOOL:(char)value forTag:(unsigned short)tag ;
+-(void)writeFixed32:(unsigned)value forTag:(unsigned short)tag ;
+-(void)writeFloat:(float)value forTag:(unsigned short)tag ;
+-(void)writeInt32:(int)value forTag:(unsigned short)tag ;
+-(void)writeSint32:(int)value forTag:(unsigned short)tag ;
+-(char)writeData:(id)value ;
+-(id)data;
 @end
+
+@interface PBCodable : NSObject
+{
+}
+
+- (id)dictionaryRepresentation;
+- (void)writeTo:(id)arg1;
+- (BOOL)readFrom:(id)arg1;
+@property(readonly, nonatomic) NSData *data; // @dynamic data;
+- (id)initWithData:(id)arg1;
+- (id)init;
+
+@end
+@interface PBRequest : PBCodable
+{
+}
+
+- (Class)responseClass;
+- (unsigned int)requestTypeCode;
+
+@end
+
+
+@interface GEOLatLng : PBCodable
+{
+    double _lat;
+    double _lng;
+}
+@end
+
+
+@interface GEOLocation : PBCodable
+{
+    double _course;
+    double _heading;
+    double _horizontalAccuracy;
+    double _speed;
+    double _timestamp;
+    double _verticalAccuracy;
+    int _altitude;
+    GEOLatLng *_latLng;
+    int _type;
+    struct {
+        unsigned int course:1;
+        unsigned int heading:1;
+        unsigned int horizontalAccuracy:1;
+        unsigned int speed:1;
+        unsigned int timestamp:1;
+        unsigned int verticalAccuracy:1;
+        unsigned int altitude:1;
+        unsigned int type:1;
+    } _has;
+}
+@end
+
+@interface GEOStructuredAddress : PBCodable
+{
+    // CDStruct_815f15fd _geoIds;
+    NSString *_administrativeArea;
+    NSString *_administrativeAreaCode;
+    NSMutableArray *_areaOfInterests;
+    NSString *_country;
+    NSString *_countryCode;
+    NSMutableArray *_dependentLocalitys;
+    NSString *_fullThoroughfare;
+    NSString *_inlandWater;
+    NSString *_locality;
+    NSString *_ocean;
+    NSString *_postCode;
+    NSString *_postCodeExtension;
+    NSString *_premise;
+    NSString *_premises;
+    NSString *_subAdministrativeArea;
+    NSString *_subLocality;
+    NSMutableArray *_subPremises;
+    NSString *_subThoroughfare;
+    NSString *_thoroughfare;
+}
+@end
+
+@interface GEOAddress : PBCodable
+{
+    NSMutableArray *_formattedAddressLines;
+    int _formattedAddressType;
+    GEOStructuredAddress *_structuredAddress;
+    struct {
+        unsigned int formattedAddressType:1;
+    } _has;
+}
+@end
+
+// ouch
+@interface GEOPlaceSearchRequest : PBRequest
+{
+    // CDStruct_612aec5b _sessionGUID;
+    struct {
+        unsigned long long *list;
+        unsigned int count;
+        unsigned int size;
+    } _businessIDs;
+    // CDStruct_56d48c16 _includeAdditionalPlaceTypes;
+    // CDStruct_815f15fd _placeIDs;
+    long long _geoId;
+    unsigned long long _intersectingGeoId;
+    double _timestamp;
+    GEOAddress *_address;
+    // GEOBusinessOptions *_businessOptions;
+    int _businessSortOrder;
+    NSString *_deviceCountryCode;
+    GEOLatLng *_deviceLocation;
+    NSMutableArray *_filterByBusinessCategorys;
+    // GEOIndexQueryNode *_indexFilter;
+    NSString *_inputLanguage;
+    int _localSearchProviderID;
+    GEOLocation *_location; // This is  your location.... for some reason.
+    // GEOMapRegion *_mapRegion;
+    int _maxBusinessReviews;
+    int _maxResults;
+    NSString *_phoneticLocaleIdentifier;
+    GEOAddress *_preserveFields;
+    int _resultOffset;
+    NSString *_search;
+    NSString *_searchContext;
+    // GEOSearchSubstring *_searchContextSubstring;
+    NSMutableArray *_searchSubstrings;
+    int _sequenceNumber;
+    NSMutableArray *_serviceTags;
+    int _sessionID;
+    NSString *_suggestionsPrefix;
+    NSData *_zilchPoints;
+    BOOL _allowABTestResponse;
+    BOOL _excludeAddressInResults;
+    BOOL _includeBusinessCategories;
+    BOOL _includeBusinessRating;
+    BOOL _includeEntryPoints;
+    BOOL _includeFeatureSets;
+    BOOL _includeGeoId;
+    BOOL _includePhonetics;
+    BOOL _includeQuads;
+    BOOL _includeStatusCodeInfo;
+    BOOL _includeSuggestionsOnly;
+    BOOL _includeUnmatchedStrings;
+    BOOL _isStrictMapRegion;
+    BOOL _structuredSearch;
+    struct {
+        unsigned int sessionGUID:1;
+        unsigned int geoId:1;
+        unsigned int intersectingGeoId:1;
+        unsigned int timestamp:1;
+        unsigned int businessSortOrder:1;
+        unsigned int localSearchProviderID:1;
+        unsigned int maxBusinessReviews:1;
+        unsigned int maxResults:1;
+        unsigned int resultOffset:1;
+        unsigned int sequenceNumber:1;
+        unsigned int sessionID:1;
+        unsigned int allowABTestResponse:1;
+        unsigned int excludeAddressInResults:1;
+        unsigned int includeBusinessCategories:1;
+        unsigned int includeBusinessRating:1;
+        unsigned int includeEntryPoints:1;
+        unsigned int includeFeatureSets:1;
+        unsigned int includeGeoId:1;
+        unsigned int includePhonetics:1;
+        unsigned int includeQuads:1;
+        unsigned int includeStatusCodeInfo:1;
+        unsigned int includeSuggestionsOnly:1;
+        unsigned int includeUnmatchedStrings:1;
+        unsigned int isStrictMapRegion:1;
+        unsigned int structuredSearch:1;
+    } _has;
+}
+@end
+
+@interface GEOWaypoint : PBCodable
+{
+    NSMutableArray *_entryPoints;
+    GEOLocation *_location;
+    GEOPlaceSearchRequest *_placeSearchRequest;
+}
+@end
+
+
+@interface GEODirectionsRequest : PBRequest
+{
+    // GEOMapRegion *_currentMapRegion;
+    GEOLocation *_currentUserLocation;
+    int _departureTime;
+    unsigned int _maxRouteCount;
+    NSData *_originalRouteID;
+    NSData *_originalRouteZilchPoints;
+    PBCodable *_routeAttributes;
+    NSMutableArray *_serviceTags;
+    unsigned int _timeSinceLastRerouteRequest;
+    NSMutableArray *_waypoints;
+    struct {
+        unsigned int departureTime:1;
+        unsigned int maxRouteCount:1;
+        unsigned int timeSinceLastRerouteRequest:1;
+    } _has;
+}
+@end
+
+void logGEOPlaceSearchRequestDetails(GEOPlaceSearchRequest *request) {
+    if (!request) {
+        NSLog(@"[MapsX] GEOPlaceSearchRequest is nil");
+        return;
+    }
+    
+    NSLog(@"[MapsX] ----- GEOPlaceSearchRequest Details -----");
+    
+    // Log primitive values
+    NSLog(@"[MapsX] geoId: %lld", [request valueForKey:@"_geoId"] ? [[request valueForKey:@"_geoId"] longLongValue] : 0);
+    NSLog(@"[MapsX] intersectingGeoId: %llu", [request valueForKey:@"_intersectingGeoId"] ? [[request valueForKey:@"_intersectingGeoId"] unsignedLongLongValue] : 0);
+    NSLog(@"[MapsX] timestamp: %f", [request valueForKey:@"_timestamp"] ? [[request valueForKey:@"_timestamp"] doubleValue] : 0.0);
+    NSLog(@"[MapsX] businessSortOrder: %d", [request valueForKey:@"_businessSortOrder"] ? [[request valueForKey:@"_businessSortOrder"] intValue] : 0);
+    NSLog(@"[MapsX] localSearchProviderID: %d", [request valueForKey:@"_localSearchProviderID"] ? [[request valueForKey:@"_localSearchProviderID"] intValue] : 0);
+    NSLog(@"[MapsX] maxBusinessReviews: %d", [request valueForKey:@"_maxBusinessReviews"] ? [[request valueForKey:@"_maxBusinessReviews"] intValue] : 0);
+    NSLog(@"[MapsX] maxResults: %d", [request valueForKey:@"_maxResults"] ? [[request valueForKey:@"_maxResults"] intValue] : 0);
+    NSLog(@"[MapsX] resultOffset: %d", [request valueForKey:@"_resultOffset"] ? [[request valueForKey:@"_resultOffset"] intValue] : 0);
+    NSLog(@"[MapsX] sequenceNumber: %d", [request valueForKey:@"_sequenceNumber"] ? [[request valueForKey:@"_sequenceNumber"] intValue] : 0);
+    NSLog(@"[MapsX] sessionID: %d", [request valueForKey:@"_sessionID"] ? [[request valueForKey:@"_sessionID"] intValue] : 0);
+    
+    // Log BOOL values
+    NSLog(@"[MapsX] allowABTestResponse: %d", [request valueForKey:@"_allowABTestResponse"] ? [[request valueForKey:@"_allowABTestResponse"] boolValue] : NO);
+    NSLog(@"[MapsX] excludeAddressInResults: %d", [request valueForKey:@"_excludeAddressInResults"] ? [[request valueForKey:@"_excludeAddressInResults"] boolValue] : NO);
+    NSLog(@"[MapsX] includeBusinessCategories: %d", [request valueForKey:@"_includeBusinessCategories"] ? [[request valueForKey:@"_includeBusinessCategories"] boolValue] : NO);
+    NSLog(@"[MapsX] includeBusinessRating: %d", [request valueForKey:@"_includeBusinessRating"] ? [[request valueForKey:@"_includeBusinessRating"] boolValue] : NO);
+    NSLog(@"[MapsX] includeEntryPoints: %d", [request valueForKey:@"_includeEntryPoints"] ? [[request valueForKey:@"_includeEntryPoints"] boolValue] : NO);
+    NSLog(@"[MapsX] includeFeatureSets: %d", [request valueForKey:@"_includeFeatureSets"] ? [[request valueForKey:@"_includeFeatureSets"] boolValue] : NO);
+    NSLog(@"[MapsX] includeGeoId: %d", [request valueForKey:@"_includeGeoId"] ? [[request valueForKey:@"_includeGeoId"] boolValue] : NO);
+    NSLog(@"[MapsX] includePhonetics: %d", [request valueForKey:@"_includePhonetics"] ? [[request valueForKey:@"_includePhonetics"] boolValue] : NO);
+    NSLog(@"[MapsX] includeQuads: %d", [request valueForKey:@"_includeQuads"] ? [[request valueForKey:@"_includeQuads"] boolValue] : NO);
+    NSLog(@"[MapsX] includeStatusCodeInfo: %d", [request valueForKey:@"_includeStatusCodeInfo"] ? [[request valueForKey:@"_includeStatusCodeInfo"] boolValue] : NO);
+    NSLog(@"[MapsX] includeSuggestionsOnly: %d", [request valueForKey:@"_includeSuggestionsOnly"] ? [[request valueForKey:@"_includeSuggestionsOnly"] boolValue] : NO);
+    NSLog(@"[MapsX] includeUnmatchedStrings: %d", [request valueForKey:@"_includeUnmatchedStrings"] ? [[request valueForKey:@"_includeUnmatchedStrings"] boolValue] : NO);
+    NSLog(@"[MapsX] isStrictMapRegion: %d", [request valueForKey:@"_isStrictMapRegion"] ? [[request valueForKey:@"_isStrictMapRegion"] boolValue] : NO);
+    NSLog(@"[MapsX] structuredSearch: %d", [request valueForKey:@"_structuredSearch"] ? [[request valueForKey:@"_structuredSearch"] boolValue] : NO);
+    
+    // Log string values
+    NSLog(@"[MapsX] deviceCountryCode: %@", [request valueForKey:@"_deviceCountryCode"]);
+    NSLog(@"[MapsX] inputLanguage: %@", [request valueForKey:@"_inputLanguage"]);
+    NSLog(@"[MapsX] phoneticLocaleIdentifier: %@", [request valueForKey:@"_phoneticLocaleIdentifier"]);
+    NSLog(@"[MapsX] search: %@", [request valueForKey:@"_search"]);
+    NSLog(@"[MapsX] searchContext: %@", [request valueForKey:@"_searchContext"]);
+    NSLog(@"[MapsX] suggestionsPrefix: %@", [request valueForKey:@"_suggestionsPrefix"]);
+    
+    // Log complex objects
+    GEOAddress *address = [request valueForKey:@"_address"];
+    if (address) {
+        NSLog(@"[MapsX] address: %@", [address description]);
+        
+        NSArray *formattedAddressLines = [address valueForKey:@"_formattedAddressLines"];
+        if (formattedAddressLines && [formattedAddressLines count] > 0) {
+            NSLog(@"[MapsX] address formattedAddressLines: %@", formattedAddressLines);
+        }
+        
+        GEOStructuredAddress *structuredAddress = [address valueForKey:@"_structuredAddress"];
+        if (structuredAddress) {
+            NSLog(@"[MapsX] structuredAddress: %@", structuredAddress);
+            NSLog(@"[MapsX] country: %@", [structuredAddress valueForKey:@"_country"]);
+            NSLog(@"[MapsX] countryCode: %@", [structuredAddress valueForKey:@"_countryCode"]);
+            NSLog(@"[MapsX] administrativeArea: %@", [structuredAddress valueForKey:@"_administrativeArea"]);
+            NSLog(@"[MapsX] locality: %@", [structuredAddress valueForKey:@"_locality"]);
+            NSLog(@"[MapsX] thoroughfare: %@", [structuredAddress valueForKey:@"_thoroughfare"]);
+            NSLog(@"[MapsX] subThoroughfare: %@", [structuredAddress valueForKey:@"_subThoroughfare"]);
+            NSLog(@"[MapsX] postCode: %@", [structuredAddress valueForKey:@"_postCode"]);
+        }
+    }
+    
+    GEOLatLng *deviceLocation = [request valueForKey:@"_deviceLocation"];
+    if (deviceLocation) {
+        NSNumber *lat = [deviceLocation valueForKey:@"_lat"];
+        NSNumber *lng = [deviceLocation valueForKey:@"_lng"];
+        NSLog(@"[MapsX] deviceLocation: lat=%@, lng=%@", lat, lng);
+    }
+    
+    GEOLocation *location = [request valueForKey:@"_location"];
+    if (location) {
+        NSLog(@"[MapsX] location: %@", [location description]);
+        
+        GEOLatLng *locLatLng = [location valueForKey:@"_latLng"];
+        if (locLatLng) {
+            NSNumber *lat = [locLatLng valueForKey:@"_lat"];
+            NSNumber *lng = [locLatLng valueForKey:@"_lng"];
+            NSLog(@"[MapsX] location latLng: lat=%@, lng=%@", lat, lng);
+        }
+        
+        NSLog(@"[MapsX] location timestamp: %f", [[location valueForKey:@"_timestamp"] doubleValue]);
+        NSLog(@"[MapsX] location horizontalAccuracy: %f", [[location valueForKey:@"_horizontalAccuracy"] doubleValue]);
+        NSLog(@"[MapsX] location verticalAccuracy: %f", [[location valueForKey:@"_verticalAccuracy"] doubleValue]);
+        NSLog(@"[MapsX] location altitude: %d", [[location valueForKey:@"_altitude"] intValue]);
+        NSLog(@"[MapsX] location course: %f", [[location valueForKey:@"_course"] doubleValue]);
+        NSLog(@"[MapsX] location heading: %f", [[location valueForKey:@"_heading"] doubleValue]);
+        NSLog(@"[MapsX] location speed: %f", [[location valueForKey:@"_speed"] doubleValue]);
+    }
+    
+    // Log arrays
+    NSArray *filterByBusinessCategorys = [request valueForKey:@"_filterByBusinessCategorys"];
+    if (filterByBusinessCategorys) {
+        NSLog(@"[MapsX] filterByBusinessCategorys: %@", filterByBusinessCategorys);
+    }
+    
+    NSArray *searchSubstrings = [request valueForKey:@"_searchSubstrings"];
+    if (searchSubstrings) {
+        NSLog(@"[MapsX] searchSubstrings: %@", searchSubstrings);
+    }
+    
+    NSArray *serviceTags = [request valueForKey:@"_serviceTags"];
+    if (serviceTags) {
+        NSLog(@"[MapsX] serviceTags: %@", serviceTags);
+    }
+    
+    // Log data objects
+    NSData *zilchPoints = [request valueForKey:@"_zilchPoints"];
+    if (zilchPoints) {
+        NSLog(@"[MapsX] zilchPoints length: %lu", (unsigned long)[zilchPoints length]);
+    }
+    
+    // Try to log struct flags
+    NSValue *hasValue = [request valueForKey:@"_has"];
+    if (hasValue) {
+        unsigned int hasFlags = 0;
+        if ([hasValue isKindOfClass:[NSNumber class]]) {
+            hasFlags = [(NSNumber *)hasValue unsignedIntValue];
+        } else {
+            [hasValue getValue:&hasFlags];
+        }
+        NSLog(@"[MapsX] has flags: %u", hasFlags);
+    }
+    
+    NSLog(@"[MapsX] ----- End GEOPlaceSearchRequest Details -----");
+}
 
 // Hell. You may be wondering why is this nessiary?
 // well stringByAddingPercentEscapesUsingEncoding doesn't encode = for the query params :)
@@ -157,7 +515,21 @@ NSURL *addAccessKeyToURL(NSURL *originalURL) {
     newURLString = [newURLString stringByReplacingOccurrencesOfString:@"gsp10-ssl.ls.apple.com/use" withString:@"gsp64-ssl.ls.apple.com/a/v2/use"];
     NSURL *newURL = [NSURL URLWithString:newURLString];
 
-    // Check if the URL host is "gspe21-ssl.ls.apple.com" and change the scheme to "http"
+    // if ([newURLString containsString:@"invalid.server"]) {
+    //     void *callstack[128];
+	// 	int frames = backtrace(callstack, 128);
+	// 	char **symbols = backtrace_symbols(callstack, frames);
+	// 	// NSString *imlazy = @"a";
+	// 	NSMutableString *callstackString = [NSMutableString stringWithFormat:@"[MapsX] Callstack for modifying:\n"];;
+	// 	for (int i = 0; i < frames; i++) {
+	// 		[callstackString appendFormat:@"%s\n", symbols[i]];
+	// 	}
+	// 	NSLog(@"%@", callstackString);
+		
+	// 	free(symbols);
+    // }
+
+    // Check if the URL host is "gspe21-ssl.ls.apple.com" and change the scheme to "http"AIM
     // if ([[URL host] isEqualToString:@"gspe21-ssl.ls.apple.com"]) {
     //     NSString *newURLString = [[URL absoluteString] stringByReplacingOccurrencesOfString:@"https://" withString:@"http://"];
     //     NSURL *newURL = [NSURL URLWithString:newURLString];
@@ -201,14 +573,179 @@ NSURL *addAccessKeyToURL(NSURL *originalURL) {
 %hook GEODirectionsRequest
 
 -(void)writeTo:(id)writer {
-    NSLog(@"[MapsX] GEODirectionsRequest.writeTo called!");
-    if ([writer isKindOfClass:[PBDataWriter class]]) {
-        [writer writeInt32:64 forTag:1];
-    } else {
-        // panik
-        return %orig
+    void *callstack[128];
+    int frames = backtrace(callstack, 128);
+    char **symbols = backtrace_symbols(callstack, frames);
+    NSString *imlazy = @"a";
+    NSMutableString *callstackString = [NSMutableString stringWithFormat:@"[MapsX] Callstack for modifying %@:\n", imlazy];
+    for (int i = 0; i < frames; i++) {
+        [callstackString appendFormat:@"%s\n", symbols[i]];
     }
-    return;
+    NSLog(@"%@", callstackString);
+    
+    free(symbols);
+    NSLog(@"[MapsX] GEODirectionsRequest.writeTo called!");
+    if ([writer isKindOfClass:[PBDataWriter class]]) {      
+        NSValue *hasValue = [self valueForKey:@"_has"];
+        unsigned int hasFlags = 0;
+        
+        // i have no clue if this works
+        if ([hasValue isKindOfClass:[NSNumber class]]) {
+            hasFlags = [(NSNumber *)hasValue unsignedIntValue];
+        } else {
+            [hasValue getValue:&hasFlags];
+        }
+        
+        NSLog(@"[MapsX] Has flags: %u", hasFlags);
+
+        // route attributes  
+        PBCodable *routeAttributes = [self valueForKey:@"_routeAttributes"];
+        if (routeAttributes != nil) {
+            PBDataWriter *dataWriter = [[PBDataWriter alloc] init];
+            [routeAttributes writeTo:dataWriter];
+            [writer writeData:[dataWriter data] forTag:1];
+        }
+
+        if (hasFlags & 0x2) {  // maxRouteCount flag
+            NSNumber *maxRouteCount = [self valueForKey:@"_maxRouteCount"];
+            if (maxRouteCount != nil) {
+                [writer writeUint32:[maxRouteCount unsignedIntValue] forTag:3]; // mainTransportTypeMaxRouteCount on iOS 11
+            }
+        }
+        
+        PBCodable *currentUserLocation = [self valueForKey:@"_currentUserLocation"];
+        if (currentUserLocation != nil) {
+            PBDataWriter *dataWriter = [[PBDataWriter alloc] init];
+            [currentUserLocation writeTo:dataWriter];
+            [writer writeData:[dataWriter data] forTag:4];
+        }
+
+        PBCodable *currentMapRegion = [self valueForKey:@"_currentMapRegion"];
+        if (currentMapRegion != nil) {
+            PBDataWriter *dataWriter = [[PBDataWriter alloc] init];
+            [currentMapRegion writeTo:dataWriter];
+            [writer writeData:[dataWriter data] forTag:5];
+        }
+        
+
+        NSData* (^writeWaypointAsTyped)(GEOWaypoint *) = ^NSData* (GEOWaypoint *waypoint) {
+            PBDataWriter *waypointWriter = [[PBDataWriter alloc] init];
+            // I'm not sure of all the types but,
+            // 2 = place search result?
+            // 4 = Latlong/gps loc?
+            GEOPlaceSearchRequest *placeRequest = [waypoint valueForKey:@"_placeSearchRequest"];
+            GEOPlaceSearchRequest *location = [waypoint valueForKey:@"_location"];
+            if (placeRequest) { // type 2
+                logGEOPlaceSearchRequestDetails(placeRequest);
+                if (location) {
+                    NSLog(@"[MapsX] Location isn't nil!");
+                }
+                [waypointWriter writeInt32:2 forTag:1];
+                PBDataWriter *waypointId = [[PBDataWriter alloc] init];
+                // [waypointId writeUint64:11026153924627430591LLU forTag:1]; // MUID, i have no idea what this
+                // [waypointId writeUint64:7618 forTag:2]; // ResultProviderId
+                NSString *search = [placeRequest valueForKey:@"_search"]; // I am not happy about this being the only data for some requests.
+                GEOLocation *placeLocation = [placeRequest valueForKey:@"_location"];
+                if (placeLocation) {
+                    GEOLatLng *latLng = [placeLocation valueForKey:@"_latLng"];
+                    if (latLng) {
+                        NSNumber *lat = [latLng valueForKey:@"_lat"];
+                        NSNumber *lng = [latLng valueForKey:@"_lng"];
+                        if (lat && lng) {
+                            NSLog(@"[MapsX] writing lat/long");
+                            NSLog(@"Lat Long: %@, %@", lat, lng);
+                            PBDataWriter *latlong = [[PBDataWriter alloc] init];
+                            [latlong writeDouble:[lat doubleValue] forTag:1];
+                            [latlong writeDouble:[lng doubleValue] forTag:2];
+                            [waypointId writeData:[latlong data] forTag:3];
+                        }
+                    }
+                }
+                GEOAddress *address = [placeRequest valueForKey:@"_address"];
+                if (address) {
+                    NSLog(@"[MapsX] has address");
+                    GEOStructuredAddress *stAddress = [placeRequest valueForKey:@"_structuredAddress"];
+                    if (stAddress) {
+                        NSLog(@"[MapsX] writing structured address data ");
+                        PBDataWriter *stAddressP = [[PBDataWriter alloc] init];
+                        [stAddress writeTo:stAddressP];
+                        [waypointId writeData:[stAddressP data] forTag:4];
+                    }
+                }
+
+                // [waypointId writeString:@"Los Angeles" forTag:5]; // placeName
+                
+                if (search) {
+                    NSLog(@"[MapsX] search request %@", search);
+                    [waypointId writeString:search forTag:5]; // maybe it'll figure it out?
+                    [waypointId writeString:search forTag:6];
+                } else {
+                    NSLog(@"[MapsX] no search request");
+                }
+                
+                
+                
+                [waypointId writeInt32:16 forTag:7]; // placeTypeHint
+                [waypointWriter writeData:[waypointId data] forTag:2];
+            } else if (location) {
+                NSLog(@"[MapsX] Writing the other waypoint temp data");
+                [waypointWriter writeInt32:4 forTag:1];// types
+        
+                // // Create a properly nested message for tag4 inside tag22
+                PBDataWriter *locationP = [[PBDataWriter alloc] init];
+                [location writeTo:locationP];
+
+                PBDataWriter *tag22_4 = [[PBDataWriter alloc] init];
+                [tag22_4 writeData:[locationP data] forTag:1];
+                
+                [waypointWriter writeData:[tag22_4 data] forTag:4];
+                [waypointWriter writeInt32:1 forTag:5];
+            }
+            return [waypointWriter data];
+        };
+        
+        NSArray *waypoints = [self valueForKey:@"_waypoints"];
+        NSFastEnumerationState state = {0};
+        __unsafe_unretained id objects[16];
+        NSUInteger count = [waypoints countByEnumeratingWithState:&state objects:objects count:16];
+        if (count != 0) {
+            do {
+                for (NSUInteger i = 0; i < count; i++) {
+                    id waypoint = state.itemsPtr[i];
+                    NSData *waypointData = writeWaypointAsTyped(waypoint);
+                    [writer writeData:waypointData forTag:22];
+                }
+                count = [waypoints countByEnumeratingWithState:&state objects:objects count:16];
+            } while (count != 0);
+        } 
+
+        PBCodable *currentMapRegion = [self valueForKey:@"_currentMapRegion"];
+        if (currentMapRegion != nil) {
+            PBDataWriter *dataWriter = [[PBDataWriter alloc] init];
+            [currentMapRegion writeTo:dataWriter];
+            [writer writeData:[dataWriter data] forTag:5];
+        }
+
+        NSArray *serviceTags = [self valueForKey:@"_serviceTags"];
+        NSFastEnumerationState serviceState = {0};
+        id serviceObjects[16];
+        count = [serviceTags countByEnumeratingWithState:&serviceState objects:serviceObjects count:16];
+        if (count != 0) {
+            do {
+                for (NSUInteger i = 0; i < count; i++) {
+                    id serviceTag = serviceState.itemsPtr[i];
+                    PBDataWriter *serviceWriter = [[PBDataWriter alloc] init];
+                    [serviceTag writeTo:serviceWriter];
+                    [writer writeData:[serviceWriter data] forTag:100];
+                    [serviceWriter release];
+                }
+                count = [serviceTags countByEnumeratingWithState:&serviceState objects:serviceObjects count:16];
+            } while (count != 0);
+        }
+        
+    } else {
+        return %orig;
+    }
 }
 
 %end
