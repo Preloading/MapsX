@@ -1,8 +1,8 @@
 Package: com.skyglow.mapsx
 Name: MapsX
-Version: 3.0
+Version: 3.1
 Architecture: iphoneos-arm
-Description: This tweak fixes Apple Maps and any MapView in the system (asking Siri for location...) by redirecting various dead URI.
+Description: This tweak fixes Apple Maps and any MapView in the system (asking Siri for location...).
 Maintainer: Requis
 Author: Requis
 Depiction: http://cydia.skyglow.es/depictions/com.skyglow.mapsx/depictions/index.html
