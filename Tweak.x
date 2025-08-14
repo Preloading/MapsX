@@ -414,7 +414,7 @@ NSURL *addAccessKeyToURL(NSURL *originalURL) {
             GEOPlaceSearchRequest *placeRequest = [waypoint valueForKey:@"_placeSearchRequest"];
             GEOPlaceSearchRequest *location = [waypoint valueForKey:@"_location"];
             if (placeRequest) { // type 2, GEOWaypointID, https://github.com/nst/iOS-Runtime-Headers/blob/f53e3d01aceb4aab6ec2c37338d2df992d917536/PrivateFrameworks/GeoServices.framework/GEOWaypointID.h
-                logGEOPlaceSearchRequestDetails(placeRequest);
+                // logGEOPlaceSearchRequestDetails(placeRequest);
                 [waypointWriter writeInt32:2 forTag:1];
                 PBDataWriter *waypointId = [[PBDataWriter alloc] init];
                 // [waypointId writeUint64:11026153924627430591LLU forTag:1]; // I think this is some sort of ID for the location? i dunno.
@@ -427,8 +427,6 @@ NSURL *addAccessKeyToURL(NSURL *originalURL) {
                         NSNumber *lat = [latLng valueForKey:@"_lat"];
                         NSNumber *lng = [latLng valueForKey:@"_lng"];
                         if (lat && lng) {
-                            NSLog(@"[MapsX] writing lat/long");
-                            NSLog(@"Lat Long: %@, %@", lat, lng);
                             PBDataWriter *latlong = [[PBDataWriter alloc] init];
                             [latlong writeDouble:[lat doubleValue] forTag:1];
                             [latlong writeDouble:[lng doubleValue] forTag:2];
@@ -463,10 +461,11 @@ NSURL *addAccessKeyToURL(NSURL *originalURL) {
                                 NSLog(@"[MapsX] generating new data");
                                 GEOWaypointID *waypointID = [GEOWaypointID alloc];
                                 NSError *error = [QueryToLatLng getQueryToLatLng:search region:currentMapRegion out:waypointID];
-                                NSLog(@"[MapsX] Query outputted: %@", error);
                                 if (!error) {
                                     // nice
                                     [waypointID writeTo:waypointId]; // crimes
+                                } else {
+                                    NSLog(@"[MapsX] Failed to get more info for location: %@", error);
                                 }
                             } else {
                                 NSLog(@"[MapsX] Uhhhh we don't have currentMapRegion, thats fun!");
