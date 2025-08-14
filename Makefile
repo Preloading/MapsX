@@ -7,7 +7,7 @@ include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = MapsX
 
-MapsX_FILES = Tweak.x TokenManager.m
+MapsX_FILES = Tweak.x TokenManager.m QueryToLatLng.m
 MapsX_CFLAGS = -fobjc-arc
 MapsX_FRAMEWORKS = Foundation CoreFoundation
 MapsX_PRIVATE_FRAMEWORKS = ProtocolBuffer
