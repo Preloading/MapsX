@@ -569,42 +569,42 @@ NSURL *addAccessKeyToURL(NSURL *originalURL) {
 }
 
 %end
-%hook GEOAltitudeManifest
-+ (id)sharedManager { %log; id r = %orig; NSLog(@" = %@", r); return r; }
-- (void)parser:(id)arg1 didStartElement:(id)arg2 namespaceURI:(id)arg3 qualifiedName:(id)arg4 attributes:(id)arg5 { %log; %orig; }
-- (void)parseManifest:(id)arg1 { %log; %orig; }
-- (id)availableRegions { %log; id r = %orig; NSLog(@" = %@", r); return r; }
-- (unsigned int)versionForRegion:(unsigned int)arg1 { %log; unsigned int r = %orig; NSLog(@" = %u", r); return r; }
-- (void)dealloc { %log; %orig; }
-- (BOOL)parseXml:(id)arg1 { %log; BOOL r = %orig; NSLog(@" = %d", r); return r; }
-- (void)_activeTileGroupChanged:(id)arg1 { %log; %orig; }
-- (id)initWithoutObserver { %log; id r = %orig; NSLog(@" = %@", r); return r; }
-- (id)init { %log; id r = %orig; NSLog(@" = %@", r); return r; }
-%end
-
-
-// %hook AltitudeNetworkRunLoop
-// + (void)AltitudeNetworkRun:(id)arg1 { %log; %orig; }
-// + (void)_runNetworkThread:(id)arg1 { %log; %orig; }
+// %hook GEOAltitudeManifest
+// + (id)sharedManager { %log; id r = %orig; NSLog(@" = %@", r); return r; }
+// - (void)parser:(id)arg1 didStartElement:(id)arg2 namespaceURI:(id)arg3 qualifiedName:(id)arg4 attributes:(id)arg5 { %log; %orig; }
+// - (void)parseManifest:(id)arg1 { %log; %orig; }
+// - (id)availableRegions { %log; id r = %orig; NSLog(@" = %@", r); return r; }
+// - (unsigned int)versionForRegion:(unsigned int)arg1 { %log; unsigned int r = %orig; NSLog(@" = %u", r); return r; }
+// - (void)dealloc { %log; %orig; }
+// - (BOOL)parseXml:(id)arg1 { %log; BOOL r = %orig; NSLog(@" = %d", r); return r; }
+// - (void)_activeTileGroupChanged:(id)arg1 { %log; %orig; }
+// - (id)initWithoutObserver { %log; id r = %orig; NSLog(@" = %@", r); return r; }
+// - (id)init { %log; id r = %orig; NSLog(@" = %@", r); return r; }
 // %end
-%hook AltMapView
-// + (Class)layerClass { %log; Class r = %orig; NSLog(@" = %@", r); return r; }
-// - (void)setDirectionsDelegate:(NSObject *)directionsDelegate { %log; %orig; }
-// - (NSObject *)directionsDelegate { %log; NSObject *r = %orig; NSLog(@" = 0x%llx", (uint64_t)r); return r; }
-// - (void)setDownloading:(BOOL)downloading { %log; %orig; }
-// - (BOOL)downloading { %log; BOOL r = %orig; NSLog(@" = %d", r); return r; }
-// - (void)setDelegate:(id)delegate { %log; %orig; }
-// - (id)delegate { %log; id r = %orig; NSLog(@" = 0x%llx", (uint64_t)r); return r; }
-// - (void)setRenderer:(__strong id *)renderer { %log; %orig; }
-// - (__strong id *)renderer { %log; __strong id *r = %orig; NSLog(@" = %p", r); return r; }
-- (void)setManifest:(NSString *)manifest { %log; %orig; }
-- (NSString *)manifest { %log; NSString *r = %orig; NSLog(@" = %@", r); return r; }
-// - (void)initialize { %log; %orig; }
-%end
 
-// %hook AltTileFetcher
-// - (BOOL)isDownloading { %log; BOOL r = %orig; NSLog(@" = %d", r); return r; }
-// - (void)purgeExpired:(double)arg1 { %log; %orig; }
-// - (void)cancelRequests { %log; %orig; }
-// - (_Bool)fetchDataForJobs:(id)arg1 count:(unsigned int)arg2 { %log; _Bool r = %orig; NSLog(@" = %d", r); return r; }
+
+// // %hook AltitudeNetworkRunLoop
+// // + (void)AltitudeNetworkRun:(id)arg1 { %log; %orig; }
+// // + (void)_runNetworkThread:(id)arg1 { %log; %orig; }
+// // %end
+// %hook AltMapView
+// // + (Class)layerClass { %log; Class r = %orig; NSLog(@" = %@", r); return r; }
+// // - (void)setDirectionsDelegate:(NSObject *)directionsDelegate { %log; %orig; }
+// // - (NSObject *)directionsDelegate { %log; NSObject *r = %orig; NSLog(@" = 0x%llx", (uint64_t)r); return r; }
+// // - (void)setDownloading:(BOOL)downloading { %log; %orig; }
+// // - (BOOL)downloading { %log; BOOL r = %orig; NSLog(@" = %d", r); return r; }
+// // - (void)setDelegate:(id)delegate { %log; %orig; }
+// // - (id)delegate { %log; id r = %orig; NSLog(@" = 0x%llx", (uint64_t)r); return r; }
+// // - (void)setRenderer:(__strong id *)renderer { %log; %orig; }
+// // - (__strong id *)renderer { %log; __strong id *r = %orig; NSLog(@" = %p", r); return r; }
+// - (void)setManifest:(NSString *)manifest { %log; %orig; }
+// - (NSString *)manifest { %log; NSString *r = %orig; NSLog(@" = %@", r); return r; }
+// // - (void)initialize { %log; %orig; }
 // %end
+
+// // %hook AltTileFetcher
+// // - (BOOL)isDownloading { %log; BOOL r = %orig; NSLog(@" = %d", r); return r; }
+// // - (void)purgeExpired:(double)arg1 { %log; %orig; }
+// // - (void)cancelRequests { %log; %orig; }
+// // - (_Bool)fetchDataForJobs:(id)arg1 count:(unsigned int)arg2 { %log; _Bool r = %orig; NSLog(@" = %d", r); return r; }
+// // %end
