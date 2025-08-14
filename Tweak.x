@@ -278,36 +278,65 @@ NSURL *addAccessKeyToURL(NSURL *originalURL) {
 
 - (instancetype)initWithURL:(NSURL *)URL cachePolicy:(NSURLRequestCachePolicy)cachePolicy timeoutInterval:(NSTimeInterval)timeoutInterval {
     //  URL Rewrites
-    NSString *newURLString = [[URL absoluteString] stringByReplacingOccurrencesOfString:@"gspa35-ssl.ls.apple.com" withString:@"gspe35-ssl.ls.apple.com"];
-    newURLString = [newURLString stringByReplacingOccurrencesOfString:@"gspa11.ls.apple.com" withString:@"gspe11-ssl.ls.apple.com"];
-    newURLString = [newURLString stringByReplacingOccurrencesOfString:@"gspa12.ls.apple.com" withString:@"gspe12.ls.apple.com"];
-    newURLString = [newURLString stringByReplacingOccurrencesOfString:@"gspa19.ls.apple.com" withString:@"gspe19.ls.apple.com"];
-    // newURLString = [newURLString stringByReplacingOccurrencesOfString:@"gspe19-ssl.ls.apple.com" withString:@"gspe19.ls.apple.com"];
-    newURLString = [newURLString stringByReplacingOccurrencesOfString:@"gspa21.ls.apple.com" withString:@"gspa21.ls.apple.com"];
-    newURLString = [newURLString stringByReplacingOccurrencesOfString:@"gsp1.apple.com" withString:@"gspe1-ssl.ls.apple.com"];
-    newURLString = [newURLString stringByReplacingOccurrencesOfString:@"gsp10-ssl.ls.apple.com/use" withString:@"gsp64-ssl.ls.apple.com/a/v2/use"];
+	if (!URL) {
+		NSLog(@"[MapsX] Bad URL");
+		return %orig;
+	}
+	
+	NSString *host = [URL host];
+	if (!host) {
+		NSLog(@"[MapsX] Bad URL: %@", [URL absoluteString]);
+		return %orig;
+	}
+
+	NSString *newHost = nil;
+	BOOL modifyHost = false;
+	if ([host isEqualToString:@"gspa35-ssl.ls.apple.com"]) {
+		newHost = @"gspe35-ssl.ls.apple.com";
+		modifyHost = true;
+	} else if ([host isEqualToString:@"gspa11.ls.apple.com"]) {
+		newHost = @"gspe11-ssl.ls.apple.com";
+		modifyHost = true;
+	} else if ([host isEqualToString:@"gspa19.ls.apple.com"]) {
+		newHost = @"gspe19.ls.apple.com";
+		modifyHost = true;
+	} else if ([host isEqualToString:@"gspa21.ls.apple.com"]) {
+		newHost = @"gspa21.ls.apple.com";
+		modifyHost = true;
+	} else if ([host isEqualToString:@"gsp1.apple.com"]) {
+		newHost = @"gsp1.apple.com";
+		modifyHost = true;
+	} else if ([host isEqualToString:@"gsp10-ssl.ls.apple.com"]) {
+		newHost = @"gsp64-ssl.ls.apple.com";
+		modifyHost = true;
+	}
+
+	if (!modifyHost) {
+		return %orig;
+	}
+
+	// and now for the fun bit, recreating!
+	NSString *scheme = [URL scheme];
+	NSString *path = [URL path];
+	NSString *query = [URL query];
+
+	NSMutableString *newURLString = [NSMutableString string];
+	[newURLString appendFormat:@"%@://%@", scheme, newHost];
+
+	// now for the extra params
+	if (path && ![path isEqualToString:@""]) {
+        if ([newHost isEqualToString:@"gsp64-ssl.ls.apple.com"] && [path isEqualToString:@"/use"]) {
+            [newURLString appendString:@"/a/v2/use"];
+        } else {
+            [newURLString appendString:path];
+        }
+	}
+
+	if (query && ![query isEqualToString:@""]) {
+		[newURLString appendFormat:@"?%@", query];
+	}
+
     NSURL *newURL = [NSURL URLWithString:newURLString];
-
-    // if ([newURLString containsString:@"invalid.server"]) {
-    //     void *callstack[128];
-	// 	int frames = backtrace(callstack, 128);
-	// 	char **symbols = backtrace_symbols(cdispatcherallstack, frames);
-	// 	// NSString *imlazy = @"a";
-	// 	NSMutableString *callstackString = [NSMutableString stringWithFormat:@"[MapsX] Callstack for modifying:\n"];;
-	// 	for (int i = 0; i < frames; i++) {
-	// 		[callstackString appendFormat:@"%s\n", symbols[i]];
-	// 	}
-	// 	NSLog(@"%@", callstackString);
-		
-	// 	free(symbols);
-    // }
-
-    // Check if the URL host is "gspe21-ssl.ls.apple.com" and change the scheme to "http"AIM
-    // if ([[URL host] isEqualToString:@"gspe21-ssl.ls.apple.com"]) {
-    //     NSString *newURLString = [[URL absoluteString] stringByReplacingOccurrencesOfString:@"https://" withString:@"http://"];
-    //     NSURL *newURL = [NSURL URLWithString:newURLString];
-    //     return %orig(newURL, cachePolicy, timeoutInterval);
-    // }
     return %orig(newURL, cachePolicy, timeoutInterval);
 }
 
@@ -325,9 +354,9 @@ NSURL *addAccessKeyToURL(NSURL *originalURL) {
         return %orig(request, delegate, startImmediately);
     }
 
-    NSString *urlString = [originalURL absoluteString];
+    // NSString *urlString = [originalURL absoluteString];
     
-    NSLog(@"Original URL (initWithRequest:delegate:startImmediately:): %@", urlString);
+    // NSLog(@"Original URL (initWithRequest:delegate:startImmediately:): %@", urlString);
     
     // Use the helper function to add the accessKey parameter
     NSURL *newURL = addAccessKeyToURL(originalURL);
@@ -336,7 +365,7 @@ NSURL *addAccessKeyToURL(NSURL *originalURL) {
     NSMutableURLRequest *modifiedRequest = [request mutableCopy];
     [modifiedRequest setURL:newURL];
     
-    NSLog(@"Modified URL (initWithRequest:delegate:startImmediately:): %@", [newURL absoluteString]);
+    // NSLog(@"Modified URL (initWithRequest:delegate:startImmediately:): %@", [newURL absoluteString]);
     
     return %orig(modifiedRequest, delegate, startImmediately);
 }
