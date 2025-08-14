@@ -460,13 +460,20 @@ NSURL *addAccessKeyToURL(NSURL *originalURL) {
                         if (search) {
                             NSLog(@"[MapsX] search request %@", search);
                             if (currentMapRegion) { 
+                                NSLog(@"[MapsX] generating new data");
                                 GEOWaypointID *waypointID = [GEOWaypointID alloc];
                                 NSError *error = [QueryToLatLng getQueryToLatLng:search region:currentMapRegion out:waypointID];
                                 NSLog(@"[MapsX] Query outputted: %@", error);
+                                if (!error) {
+                                    // nice
+                                    [waypointID writeTo:waypointId]; // crimes
+                                }
+                            } else {
+                                NSLog(@"[MapsX] Uhhhh we don't have currentMapRegion, thats fun!");
                             }
                             
 
-                            [waypointId writeString:search forTag:5]; 
+                            // [waypointId writeString:search forTag:5]; 
                             // [waypointId writeString:search forTag:6]; // mapRegion, or smth like that
                         } else {
                             NSLog(@"[MapsX] no search request, uhhhh what? bruh.");

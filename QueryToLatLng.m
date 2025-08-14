@@ -117,21 +117,22 @@ NSString *GetOSVersion(void) {
     {  
         NSDictionary *data = object;
 
-        if ([data[@"mapsResult"] isKindOfClass:[NSArray class]] && [data[@"mapsResult"][0] isKindOfClass:[NSDictionary class]]) { // I hope i understand how the param checking works, and that it checks it in a row.
+        if ([data[@"mapsResult"] isKindOfClass:[NSArray class]] && ([data[@"mapsResult"] count] > 0) && [data[@"mapsResult"][0] isKindOfClass:[NSDictionary class]]) { // I hope i understand how the param checking works, and that it checks it in a row.
             NSDictionary *mapsResult = data[@"mapsResult"][0]; // we only care about the first value.
             if ([mapsResult[@"place"] isKindOfClass:[NSDictionary class]]) {
                 NSDictionary *mapPlace = mapsResult[@"place"];
                 // at this point i pray that the data is intact and what i expect
-
-                output.muid = [mapPlace[@"muid"] longValue];
+                
+                output.muid = [mapPlace[@"muid"] longLongValue];
                 output.resultProviderId = [mapPlace[@"resultProviderId"] longValue];
+
                 NSArray *components = mapPlace[@"component"];
-                for (int i = 0; components.count < i; i++) { // for loops scare me
+                for (int i = 0; components.count > i; i++) { // for loops scare me
                     NSDictionary *component = components[i];
                     NSString *componentType = component[@"type"];
                     NSArray *componentValues = component[@"value"];
 
-                    if ([componentValues count] == 0) {
+                    if (!([componentValues count] > 0)) {
                         continue;
                     }
 
@@ -144,6 +145,7 @@ NSString *GetOSVersion(void) {
                                 GEOLatLng *locationHint = [GEOLatLng alloc];
                                 [locationHint setValue:locationCenter[@"lat"] forKey:@"_lat"];
                                 [locationHint setValue:locationCenter[@"lng"] forKey:@"_lng"];
+                                output.locationHint = locationHint;
                             }
                         }
                         
@@ -172,9 +174,9 @@ NSString *GetOSVersion(void) {
                                     output.addressHint.thoroughfare = structedAddressDict[@"thoroughfare"];
                                     output.addressHint.subThoroughfare = structedAddressDict[@"subThoroughfare"];
                                     output.addressHint.fullThoroughfare = structedAddressDict[@"fullThoroughfare"];
-                                    output.addressHint.areaOfInterests = structedAddressDict[@"areaOfInterest"];
-                                    output.addressHint.dependentLocalitys = structedAddressDict[@"dependentLocality"];
-                                    output.addressHint.subPremises = structedAddressDict[@"subPremise"];
+                                    // output.addressHint.areaOfInterests = structedAddressDict[@"areaOfInterest"];
+                                    // output.addressHint.dependentLocalitys = structedAddressDict[@"dependentLocality"];
+                                    // output.addressHint.subPremises = structedAddressDict[@"subPremise"];
                                     // geoid seems like more effort than its worth.
                                 }
                             }

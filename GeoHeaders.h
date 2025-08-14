@@ -121,6 +121,7 @@
 @property(retain, nonatomic) NSString *administrativeArea; // @synthesize administrativeArea=_administrativeArea;
 @property(retain, nonatomic) NSString *countryCode; // @synthesize countryCode=_countryCode;
 @property(retain, nonatomic) NSString *country; // @synthesize country=_country;
+
 @end
 
 @interface GEOAddress : PBCodable
