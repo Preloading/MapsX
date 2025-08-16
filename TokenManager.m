@@ -1,9 +1,11 @@
 #import <Foundation/Foundation.h>
+#include <Foundation/NSString.h>
 #import <CoreFoundation/CoreFoundation.h>
 #import "TokenManager.h"
 
 @interface TokenManager ()
-@property (nonatomic, strong) NSString *token;
+@property (nonatomic, strong) NSString *accessKey;
+@property (nonatomic, strong) NSString *accessToken;
 @property (nonatomic, assign) NSTimeInterval expiresAt;
 @property (nonatomic, strong) NSOperationQueue *tokenOperationQueue;
 @end
@@ -22,34 +24,64 @@
     return sharedManager;
 }
 
-- (NSString *)currentToken {
+// used for most apple private endpoints
+- (NSString *)currentAccessKey {
     NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
     
-    if (_token && now + 300 < _expiresAt) {
+    if (_accessKey && now + 300 < _expiresAt) {
         // Token is valid and not about to expire
         // Start async refresh if token will expire soon (within 15 minutes)
         if (now + 900 >= _expiresAt) {
             [self refreshTokenInBackground];
         }
-        return _token;
+        return _accessKey;
     } else {
         // Token is nil or expired or about to expire - need synchronous refresh
         NSInteger expiresIn = 0;
-        _token = [self requestNewMapToken:&expiresIn];
+        NSString *newAccessToken = nil;
+        _accessToken = nil;
+        _accessKey = [self requestNewMapToken:&expiresIn outAccessToken:&newAccessToken];
+        _accessToken = newAccessToken;
         
-        if (_token) {
+        if (_accessKey && _accessToken) {
             _expiresAt = now + expiresIn;
         }
-        return _token;
+        return _accessKey;
+    }
+}
+
+// used mostly by mapkit stuff
+- (NSString *)currentAccessToken {
+    NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
+    
+    if (_accessToken && now + 300 < _expiresAt) {
+        // Token is valid and not about to expire
+        // Start async refresh if token will expire soon (within 15 minutes)
+        if (now + 900 >= _expiresAt) {
+            [self refreshTokenInBackground];
+        }
+        return _accessToken;
+    } else {
+        // Token is nil or expired or about to expire - need synchronous refresh
+        NSInteger expiresIn = 0;
+        NSString *newAccessToken = nil;
+        _accessToken = nil;
+        _accessKey = [self requestNewMapToken:&expiresIn outAccessToken:&newAccessToken];
+        _accessToken = newAccessToken;
+        
+        if (_accessKey && _accessToken) {
+            _expiresAt = now + expiresIn;
+        }
+        return _accessToken;
     }
 }
 
 - (void)getTokenWithCompletion:(void (^)(NSString *token))completion {
     NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
     
-    if (_token && now + 300 < _expiresAt) {
+    if (_accessKey && now + 300 < _expiresAt) {
         // Token is valid, return immediately
-        completion(_token);
+        completion(_accessKey);
         
         // Refresh in background if needed
         if (now + 900 >= _expiresAt) {
@@ -59,10 +91,11 @@
         // Need to get a new token
         [self.tokenOperationQueue addOperationWithBlock:^{
             NSInteger expiresIn = 0;
-            NSString *newToken = [self requestNewMapToken:&expiresIn];
+            NSString *newAccessToken = nil;
+            NSString *newToken = [self requestNewMapToken:&expiresIn outAccessToken:&newAccessToken];
             
             if (newToken) {
-                self.token = newToken;
+                self.accessKey = newToken;
                 self.expiresAt = [[NSDate date] timeIntervalSince1970] + expiresIn;
             }
             
@@ -77,12 +110,13 @@
     [self.tokenOperationQueue addOperationWithBlock:^{
         NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
         // Only refresh if we still need to (another operation might have refreshed already)
-        if (!self.token || now + 300 >= self.expiresAt) {
+        if (!self.accessKey || now + 300 >= self.expiresAt) {
             NSInteger expiresIn = 0;
-            NSString *newToken = [self requestNewMapToken:&expiresIn];
+            NSString *newAccessToken = nil;
+            NSString *newToken = [self requestNewMapToken:&expiresIn outAccessToken:&newAccessToken];
             
-            if (newToken) {
-                self.token = newToken;
+            if (newToken && newAccessToken) {
+                self.accessKey = newToken;
                 self.expiresAt = [[NSDate date] timeIntervalSince1970] + expiresIn;
                 NSLog(@"Token refreshed in background");
             }
@@ -90,7 +124,7 @@
     }];
 }
 
-- (NSString *)requestNewMapToken:(NSInteger *)outExpiresIn {
+- (NSString *)requestNewMapToken:(NSInteger *)outExpiresIn outAccessToken:(NSString **)outAccessToken {
     // pods code ported to objc
     NSString *duckDuckGoTokenURL = @"https://duckduckgo.com/local.js?get_mk_token=1";
     NSURL *url = [NSURL URLWithString:duckDuckGoTokenURL];
@@ -150,6 +184,9 @@
         NSDictionary *results = object;
         if (outExpiresIn) {
             *outExpiresIn = [results[@"expiresInSeconds"] integerValue];
+        }
+        if (outAccessToken) {
+            *outAccessToken = results[@"authInfo"][@"access_token"];
         }
         return results[@"accessKey"];
     }

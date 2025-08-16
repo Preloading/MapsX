@@ -3,19 +3,19 @@
 // iOS 11, the ones with COMPONENT_ are in mapsResult, place, component
 @interface GEOWaypointID : PBCodable <NSCopying> {
     int  _addressGeocodeAccuracyHint; // dont think exists in mapkit
-    GEOStructuredAddress * _addressHint; // In mapkit: COMPONENT_TYPE_ADDRESS_OBJECT, addressObject, address, structuredAddress
-    NSMutableArray * _formattedAddressLineHints; // In mapkit: COMPONENT_TYPE_ADDRESS_OBJECT, addressObject, formattedAddressLines
+    GEOStructuredAddress * _addressHint;
+    NSMutableArray * _formattedAddressLineHints;
     struct { 
         unsigned int muid : 1; 
         unsigned int resultProviderId : 1; 
         unsigned int addressGeocodeAccuracyHint : 1; 
         unsigned int placeTypeHint : 1; 
     }  _has;
-    GEOLatLng * _locationHint; // COMPONENT_TYPE_PLACE_INFO, placeInfo, center
-    unsigned long long  _muid; // mapsResult, place, muid
-    NSString * _placeNameHint; // COMPONENT_TYPE_ENTITY, entity, name, stringValue
-    int  _placeTypeHint; // idk how to get the int for this
-    unsigned long long  _resultProviderId; // mapsResult, place, resultProviderId
+    GEOLatLng * _locationHint;
+    unsigned long long  _muid;
+    NSString * _placeNameHint;
+    int  _placeTypeHint;
+    unsigned long long  _resultProviderId;
 }
 @property (nonatomic) int addressGeocodeAccuracyHint;
 @property (nonatomic, retain) GEOStructuredAddress *addressHint;
