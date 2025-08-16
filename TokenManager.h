@@ -3,6 +3,7 @@
 @interface TokenManager : NSObject
 
 + (instancetype)sharedManager;
-- (NSString *)currentToken;
+- (NSString *)currentAccessKey;
+- (NSString *)currentAccessToken;
 
 @end

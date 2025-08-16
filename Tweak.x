@@ -137,75 +137,12 @@ void logGEOPlaceSearchRequestDetails(GEOPlaceSearchRequest *request) {
     NSLog(@"[MapsX] ----- End GEOPlaceSearchRequest Details -----");
 }
 
-// Hell. You may be wondering why is this nessiary?
-// well stringByAddingPercentEscapesUsingEncoding doesn't encode = for the query params :)
-NSString *customURLEncode(NSString *string) {
-    if (!string) return nil;
-    
-    // Characters that don't need encoding in URLs
-    NSString *reservedChars = @"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
-    
-    NSMutableString *result = [NSMutableString string];
-    NSUInteger length = [string length];
-    
-    for (NSUInteger i = 0; i < length; i++) {
-        unichar c = [string characterAtIndex:i];
-        if ([reservedChars rangeOfString:[NSString stringWithFormat:@"%C", c]].location != NSNotFound) {
-            // Character doesn't need encoding
-            [result appendFormat:@"%C", c];
-        } else {
-            // Character needs encoding
-            [result appendFormat:@"%%%02X", c];
-        }
-    }
-    
-    return result;
-}
-
-// Custom URL decoding function
-NSString *customURLDecode(NSString *string) {
-    if (!string) return nil;
-    
-    NSMutableString *result = [NSMutableString string];
-    NSUInteger length = [string length];
-    NSUInteger i = 0;
-    
-    while (i < length) {
-        unichar c = [string characterAtIndex:i];
-        if (c == '%' && i + 2 < length) {
-            // Try to parse the hex value
-            NSString *hexStr = [string substringWithRange:NSMakeRange(i + 1, 2)];
-            NSScanner *scanner = [NSScanner scannerWithString:hexStr];
-            unsigned int hexValue;
-            
-            if ([scanner scanHexInt:&hexValue]) {
-                [result appendFormat:@"%C", (unichar)hexValue];
-                i += 3; // Skip the '%' and the two hex digits
-            } else {
-                // If it's not a valid hex sequence, just add the '%'
-                [result appendString:@"%"];
-                i++;
-            }
-        } else if (c == '+') {
-            // '+' is decoded as space
-            [result appendString:@" "];
-            i++;
-        } else {
-            // Not encoded, add as is
-            [result appendFormat:@"%C", c];
-            i++;
-        }
-    }
-    
-    return result;
-}
-
 
 NSURL *addAccessKeyToURL(NSURL *originalURL) {
     if (!originalURL) return originalURL;
     
     NSString *urlString = [originalURL absoluteString];
-    NSString *token = [[TokenManager sharedManager] currentToken];
+    NSString *token = [[TokenManager sharedManager] currentAccessKey];
     
     // Parse URL parts
     NSString *baseURLString;
@@ -297,16 +234,19 @@ NSURL *addAccessKeyToURL(NSURL *originalURL) {
 	} else if ([host isEqualToString:@"gspa11.ls.apple.com"]) {
 		newHost = @"gspe11-ssl.ls.apple.com";
 		modifyHost = true;
+	} else if ([host isEqualToString:@"gspa12.ls.apple.com"]) {
+		newHost = @"gspe12-ssl.ls.apple.com";
+		modifyHost = true;
 	} else if ([host isEqualToString:@"gspa19.ls.apple.com"]) {
 		newHost = @"gspe19.ls.apple.com";
 		modifyHost = true;
 	} else if ([host isEqualToString:@"gspa21.ls.apple.com"]) {
-		newHost = @"gspa21.ls.apple.com";
+		newHost = @"gspe21-ssl.ls.apple.com";
 		modifyHost = true;
 	} else if ([host isEqualToString:@"gsp1.apple.com"]) {
 		newHost = @"gsp1.apple.com";
 		modifyHost = true;
-	} else if ([host isEqualToString:@"gsp10-ssl.ls.apple.com"]) {
+	} else if ([host isEqualToString:@"gsp10-ssl.apple.com"]) {
 		newHost = @"gsp64-ssl.ls.apple.com";
 		modifyHost = true;
 	}
@@ -350,7 +290,7 @@ NSURL *addAccessKeyToURL(NSURL *originalURL) {
          ([[originalURL host] isEqualToString:@"gspe11-ssl.ls.apple.com"]) || 
          ([[originalURL host] isEqualToString:@"gspe11.ls.apple.com"]) || 
          ([[originalURL host] isEqualToString:@"gspe19.ls.apple.com"]) || 
-         ([[originalURL host] isEqualToString:@"gspe12.ls.apple.com"]))) {
+         ([[originalURL host] isEqualToString:@"gspe12-ssl.ls.apple.com"]))) {
         return %orig(request, delegate, startImmediately);
     }
 
