@@ -234,16 +234,19 @@ NSURL *addAccessKeyToURL(NSURL *originalURL) {
 	} else if ([host isEqualToString:@"gspa11.ls.apple.com"]) {
 		newHost = @"gspe11-ssl.ls.apple.com";
 		modifyHost = true;
+	} else if ([host isEqualToString:@"gspa12.ls.apple.com"]) {
+		newHost = @"gspe12-ssl.ls.apple.com";
+		modifyHost = true;
 	} else if ([host isEqualToString:@"gspa19.ls.apple.com"]) {
 		newHost = @"gspe19.ls.apple.com";
 		modifyHost = true;
 	} else if ([host isEqualToString:@"gspa21.ls.apple.com"]) {
-		newHost = @"gspa21.ls.apple.com";
+		newHost = @"gspe21-ssl.ls.apple.com";
 		modifyHost = true;
 	} else if ([host isEqualToString:@"gsp1.apple.com"]) {
 		newHost = @"gsp1.apple.com";
 		modifyHost = true;
-	} else if ([host isEqualToString:@"gsp10-ssl.ls.apple.com"]) {
+	} else if ([host isEqualToString:@"gsp10-ssl.apple.com"]) {
 		newHost = @"gsp64-ssl.ls.apple.com";
 		modifyHost = true;
 	}
@@ -287,7 +290,7 @@ NSURL *addAccessKeyToURL(NSURL *originalURL) {
          ([[originalURL host] isEqualToString:@"gspe11-ssl.ls.apple.com"]) || 
          ([[originalURL host] isEqualToString:@"gspe11.ls.apple.com"]) || 
          ([[originalURL host] isEqualToString:@"gspe19.ls.apple.com"]) || 
-         ([[originalURL host] isEqualToString:@"gspe12.ls.apple.com"]))) {
+         ([[originalURL host] isEqualToString:@"gspe12-ssl.ls.apple.com"]))) {
         return %orig(request, delegate, startImmediately);
     }
 
