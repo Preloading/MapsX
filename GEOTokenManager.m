@@ -126,7 +126,7 @@
 
 - (NSString *)requestNewMapToken:(NSInteger *)outExpiresIn outAccessToken:(NSString **)outAccessToken {
     // pods code ported to objc
-    NSString *duckDuckGoTokenURL = @"https://duckduckgo.com/local.js?get_mk_token=1";
+    NSString *duckDuckGoTokenURL = @"http://duckduckgo.com/local.js?get_mk_token=1";
     NSURL *url = [NSURL URLWithString:duckDuckGoTokenURL];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url 
                                                           cachePolicy:NSURLRequestUseProtocolCachePolicy 
@@ -141,7 +141,7 @@
                                                             error:&error];
     
     if (error) {
-        NSLog(@"Connection failed: %@", [error localizedDescription]);
+        NSLog(@"Connection failed: %@", error);
         return nil;
     }
 
