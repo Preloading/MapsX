@@ -41,13 +41,8 @@
             [writer writeData:[dataWriter data] forTag:1];
         }
 
-        if (hasFlags & 0x2) {  // maxRouteCount flag
-            NSNumber *maxRouteCount = [self valueForKey:@"_maxRouteCount"];
-            if (maxRouteCount != nil) {
-                [writer writeUint32:[maxRouteCount unsignedIntValue] forTag:3]; // mainTransportTypeMaxRouteCount on iOS 11
-            }
-        }
-        
+        [writer writeUint32:3 forTag:3];
+
         PBCodable *currentUserLocation = [self valueForKey:@"_currentUserLocation"];
         if (currentUserLocation != nil) {
             PBDataWriter *dataWriter = [[PBDataWriter alloc] init];

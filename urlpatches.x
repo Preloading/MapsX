@@ -27,9 +27,9 @@ NSString *URLPatches(NSString *baseURL) {
     } else if ([@"http://gspa19.ls.apple.com/tile.vf?flags=4" isEqualToString:baseURL]) { // reqular with flag 4 (driving)
         return @"http://gspe19.ls.apple.com/tile.vf?flags=4";
     } else if ([@"http://gspa12.ls.apple.com/traffic" isEqualToString:baseURL]) { // traffic
-        return @"http://gspe12-ssl.ls.apple.com/traffic";
+        return @"http://gspe12.ls.apple.com/traffic";
     } else if ([@"http://gspa11.ls.apple.com/tile" isEqualToString:baseURL]) { // sat
-        return @"http://gspe11-ssl.ls.apple.com/tile";
+        return @"http://gspe11.ls.apple.com/tile";
     }
     return baseURL;
 }
@@ -49,7 +49,7 @@ NSString *URLPatches(NSString *baseURL) {
 // -(NSString*)multiTileURL {
 //     NSLog(@"multitile -> %@", %orig);
 //     // return %orig;
-//     return @"http://gspe19.ls.apple.com/tile.vf";
+//     return @"http://gspe19-ssl.ls.apple.com/tile.vf";
 // }
 
 %end
