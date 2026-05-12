@@ -13,18 +13,10 @@ typedef struct PointsStruct {
 	unsigned y;
 } PointsStruct;
 
-%hook VKShieldManager
-- (id)artworkForShieldType:(int)shieldType // WHY IS THIS NOT FOUND?????
-               textLength:(unsigned int)textLength 
-             contentScale:(float)contentScale 
-            resourceNames:(NSArray *)resourceNames 
-                    style:(id)style 
-                     mode:(int)mode {
-    
-    for (NSString *resourceName in resourceNames) {
-        NSLog(@"resource name -> %@", resourceName);
-    }
-    return %orig;
+%hook VKShieldAtlas
+
+-(id)artworkForShieldType:(int)a3 textLength:(unsigned int)a4 contentScale:(float)a5 extraScale:(float)a6 mode:(int)a7 {
+    return @"US_CA1";
 }
 %end
 
