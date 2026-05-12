@@ -107,7 +107,7 @@ static NSString *generateTokenP3() {
 
 
 
-        NSString *seperator = @"";
+        NSString *seperator = @"?";
         if ([originalURL rangeOfString:@"?"].location != NSNotFound) {
             seperator = @"&";
         }
@@ -118,7 +118,8 @@ static NSString *generateTokenP3() {
         CC_SHA256(hashData.bytes, (CC_LONG)hashData.length, digest);        
         NSData *key = [NSData dataWithBytes:digest length:CC_SHA256_DIGEST_LENGTH];
 
-        NSString *plaintext = [NSString stringWithFormat:@"%@?%@%@sid=%@%lld%@", [url path], [url query], seperator, sid, timestamp, p3];
+        NSString *query = [url query] ?: @"";
+        NSString *plaintext = [NSString stringWithFormat:@"%@?%@%@sid=%@%lld%@", [url path], query, query.length > 0 ? @"&" : @"", sid, timestamp, p3];
 
         NSData *plaintextData = [plaintext dataUsingEncoding:NSUTF8StringEncoding];
 
