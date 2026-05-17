@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <malloc/malloc.h>
 #import <substrate.h>
+#import "GEOShieldMappingManager.h"
 
 // Define a function pointer type
 typedef malloc_zone_t *(*vk_malloc_zone_t)(void);
@@ -13,12 +14,75 @@ typedef struct PointsStruct {
 	unsigned y;
 } PointsStruct;
 
-%hook VKShieldAtlas
 
--(id)artworkForShieldType:(int)a3 textLength:(unsigned int)a4 contentScale:(float)a5 extraScale:(float)a6 mode:(int)a7 {
-    return @"US_CA1";
+typedef struct {
+	int list;
+	unsigned count;
+	unsigned size;
+} SCD_Struct_VK106;
+
+
+
+@interface VKPShieldIndex : NSObject
+
+-(id)entries;
+
+@end
+
+%hook VKPShieldIndex
+
+-(NSString*)artworkIdentifierForShieldType:(int)shieldType
+{
+    // return %orig(8118);
+
+    NSString *translation = %orig(shieldType);
+    if (translation) return translation; // it's already a valid id, just send it
+
+    // check our manager for the translation-(int)translateMap:(int)map;
+
+    translation = %orig([[GEOShieldMappingManager sharedManager] translateMap:shieldType]);
+    if (translation) return translation;
+
+    NSLog(@"sdid(%i)", shieldType);
+
+    // NSLog(@"shields -> %@", [self entries]);
+
+    // NSLog(@"shield type -> %i, identifier -> %@", shieldType, orig);
+    // return @"US_CA1";
+    return translation;
 }
 %end
+
+%ctor {
+    [GEOShieldMappingManager sharedManager];
+}
+
+
+// %hook VKShieldAtlas
+// -(id)artworkForShieldIdentifier:(id)arg1 textLength:(unsigned)arg2 contentScale:(float)arg3 extraScale:(float)arg4 mode:(int)arg5 numberOfLines:(unsigned)arg6 {
+//     NSLog(@"OMG YIPEEEEEEEEEEEEEEEEeEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+//     for (id shield in [[self valueForKey:@"_shieldPack"] valueForKey:@"_shields"]) {
+//         NSLog(@"shield -> %@", shield);
+//     }
+
+//     return %orig;
+// }
+// %end
+
+// %hook VKShieldManager
+// -(id)artworkForShieldType:(int)shieldType textLength:(unsigned)textLen contentScale:(float)contentScale resourceNames:(id)resourceNames style:(id)style mode:(int)mode numberOfLines:(unsigned)numOfLines {
+//     NSLog(@"please for god work aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+//     // NSLog(@"resources names : %@", resourceNames);
+//     NSLog(@"mode -> %i, shield type -> %i", mode, shieldType);
+//     return %orig(shieldType, textLen, contentScale, resourceNames, style, mode, numOfLines);
+// }
+
+// -(id)_atlasForName:(NSString*)name
+// {
+//     NSLog(@"name of shield -> %@", name);
+//     return %orig;
+// }
+// %end
 
 %hook VKRealisticTile
 -(float)waterZ
