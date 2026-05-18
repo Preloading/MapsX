@@ -37,9 +37,13 @@ typedef struct {
 }
 %end
 
-%ctor {
+%hook GEOResourceManifestManager 
+-(id)init {
     [GEOShieldMappingManager sharedManager];
+    return %orig;
 }
+
+%end
 
 %hook VKShieldManager
 -(id)artworkForShieldType:(int)shieldType textLength:(unsigned)textLen contentScale:(float)contentScale resourceNames:(id)resourceNames style:(id)style mode:(int)mode numberOfLines:(unsigned)numOfLines {

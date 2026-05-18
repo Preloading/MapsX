@@ -8,7 +8,17 @@ include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = MapsX
 
-MapsX_FILES = Tweak.x addtoken.xm directions.x urlpatches.x  shields.x GEOTokenManager.m GEOQueryToLatLng.m GEONewerClasses.m GEOShieldMappingManager.m shieldmap-protobuf/GEOXShieldMap.m
+MapsX_FILES = Tweak.x \
+			addtoken.xm \
+			directions.x \
+			urlpatches.x \
+			shields.x \
+			GEOTokenManager.m \
+			GEOQueryToLatLng.m \
+			GEONewerClasses.m \
+			GEOShieldMappingManager.m \
+			shieldmap-protobuf/GEOXShieldMap.m \
+			attribution.x
 MapsX_CFLAGS = -fobjc-arc
 MapsX_FRAMEWORKS = Foundation CoreFoundation
 MapsX_PRIVATE_FRAMEWORKS = ProtocolBuffer GeoServices VectorKit
