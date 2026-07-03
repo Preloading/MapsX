@@ -85,6 +85,7 @@ static NSString *podkeyFor(NSString *hostAndPath) {
 static NSString *proxiedImageURLString(NSString *original) {
     NSURL *u = [NSURL URLWithString:original];
     if (!u.host) return original;
+    if ([u.host hasSuffix:@"mzstatic.com"]) return original;
     NSString *hostAndPath = [NSString stringWithFormat:@"%@%@", u.host, u.path ?: @""];
     return [NSString stringWithFormat:@"http://mpfproxy.podpod123.com/%@?podkey=%@", hostAndPath, podkeyFor(hostAndPath)];
 }
