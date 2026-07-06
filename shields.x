@@ -24,6 +24,15 @@ typedef struct {
 @interface VKShieldAtlas : NSObject
 @end
 
+%hook GEODaemon
+
+-(void)startServer:(id)a3 {
+    [GEOShieldMappingManager cacheToFile];
+    %orig;
+}
+
+%end
+
 %hook VKPShieldIndex
 
 -(NSString*)artworkIdentifierForShieldType:(int)shieldType
@@ -39,7 +48,7 @@ typedef struct {
 
 %hook GEOResourceManifestManager 
 -(id)init {
-    [GEOShieldMappingManager sharedManager];
+    [GEOShieldMappingManager initForUse];
     return %orig;
 }
 
@@ -65,8 +74,10 @@ typedef struct {
 
 -(id)iconForFeatureID:(uint64_t)featureId withResourceNames:(id)resourceNames style:(void*)style {
     int newIconID = [[GEOShieldMappingManager sharedManager] translateIconMap:featureId];
-    if (newIconID == 0) return %orig();
-
+    if (newIconID == 0)  {
+        NSLog(@"icid(%llu)", featureId);
+        return %orig();
+    } 
     return %orig(newIconID, resourceNames, style);
 }
 

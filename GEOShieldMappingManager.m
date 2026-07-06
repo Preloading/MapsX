@@ -1,6 +1,6 @@
 // This handles the conversion between the old shield ids, and the new ones given by the map. 
 // Since we don't know all the new ones, and they might change, this is pulled from my server
-// - Preloading, May 13th
+// - Preloading, May 13th 2026
 
 #import <Foundation/Foundation.h>
 #include <Foundation/NSString.h>
@@ -17,19 +17,30 @@
     dispatch_once(&onceToken, ^{
         sharedManager = [[self alloc] init];
         NSLog(@"[MapsX] Initalized Shield Manager: %p", sharedManager);
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [sharedManager loadShieldsFile];
-            [sharedManager loadShieldsOnline];
-        });
     });
     return sharedManager;
+}
+
++(void)initForUse {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [[self sharedManager] loadShieldsFile];
+    });
+}
+
++(void)cacheToFile {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [[self sharedManager] loadShieldsOnline];
+    });
 }
 
 // loads the shield data from a cache file. this should probably be used for the geo resource stuff, but thats quite annoying.
 -(NSError *)loadShieldsFile {
     NSError *error = nil;
     NSData *data = [NSData dataWithContentsOfFile:@"/private/var/mobile/Library/Caches/GeoServices/Resources/shield_maps.dat" options:0 error:&error];
-    if (error) return error;
+    if (error) {
+        NSLog(@"an error occured loading the shield maps! error: %@", error);
+        return error;
+    }
 
     if (![self hasFetchedFromOnline]) {
         return [self loadMappingsFromData:data];

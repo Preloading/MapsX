@@ -14,4 +14,6 @@
 -(NSError*)loadMappingsFromData:(NSData*)data;
 -(int)translateShieldMap:(int)map;
 -(int)translateIconMap:(int)map;
++(void)initForUse;
++(void)cacheToFile;
 @end
