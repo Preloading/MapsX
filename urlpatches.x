@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 
+%group EnableURLPatches
 %hook GEOResourceManifestServerLocalProxy
 
 - (id)_manifestURL {
@@ -63,3 +64,11 @@ NSString *URLPatches(NSString *baseURL) {
 
 
 %end
+%end
+
+
+%ctor {
+	if (kCFCoreFoundationVersionNumber <= 847.27) {
+		%init(EnableURLPatches);
+	}
+}

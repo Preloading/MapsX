@@ -5,6 +5,7 @@
 #import "GeoHeaders.h"
 #import "GEOQueryToLatLng.h"
 
+%group EnableDirectionsPatch
 %hook GEODirectionsRequest
 
 -(void)writeTo:(id)writer {
@@ -197,3 +198,10 @@
 }
 
 %end
+%end
+
+%ctor {
+	if (kCFCoreFoundationVersionNumber <= 847.27) {
+		%init(EnableDirectionsPatch);
+	}
+}
