@@ -34,7 +34,7 @@
     if (![self hasFetchedFromOnline]) {
         return [self loadMappingsFromData:data];
     }
-    return nil;
+    return [NSError errorWithDomain:@"com.skyglow.mapsx.shields" code:48 userInfo:nil];
 }
 
 -(void)loadShieldsOnline {
@@ -52,11 +52,28 @@
 }
 
 // online thingies
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
+    self->_recievedData = [[NSMutableData alloc] init];
+}
+
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
+    [self->_recievedData appendData:data];
+}
+
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     NSLog(@"[MapsX] got new shield data!");
     self->_hasFetchedFromOnline = YES;
-    [self loadMappingsFromData:data];
-    [data writeToFile:@"/private/var/mobile/Library/Caches/GeoServices/Resources/shield_maps.dat" atomically:YES];
+    NSError *error = [self loadMappingsFromData:self->_recievedData];
+    if (error) {
+        NSLog(@"[MapsX] Failed to parse shield maps!!!");
+    }
+    [self->_recievedData writeToFile:@"/private/var/mobile/Library/Caches/GeoServices/Resources/shield_maps.dat" atomically:YES];
+}
+
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    NSLog(@"[MapsX] shield download failed: %@", error);
+    self->_connection = nil;
 }
 
 -(NSError*)loadMappingsFromData:(NSData*)data {
@@ -72,14 +89,17 @@
         self->_shieldMappings = [shieldMaps copy];
         self->_dataVersion = pack.version;
     } else {
-        NSLog(@"[MapsX] Failed to parse shield maps!!!");
+        return [NSError errorWithDomain:@"com.skyglow.mapsx.shields" code:49 userInfo:nil];
     }
 
     return nil;
 }
 
--(int)translateMap:(int)map {
+-(int)translateShieldMap:(int)map {
     return [self->_shieldMappings[@(map)] integerValue];
+}
+-(int)translateIconMap:(int)map {
+    return [self->_iconMappings[@(map)] integerValue];
 }
 
 @end
