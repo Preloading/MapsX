@@ -25,8 +25,8 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSError *error = [[self sharedManager] loadShieldsFile];
         if (error) {
-            NSLog(@"[MapsX] failed to load shield maps!!! error -> %@, retrying in two seconds...", error);
-            [NSTimer scheduledTimerWithTimeInterval:2.0
+            NSLog(@"[MapsX] failed to load shield maps!!! error -> %@, retrying in four seconds...", error);
+            [NSTimer scheduledTimerWithTimeInterval:4.0
                 target:[self sharedManager]
                 selector:@selector(loadShieldsFile)
                 userInfo:nil
@@ -47,7 +47,7 @@
 // loads the shield data from a cache file. this should probably be used for the geo resource stuff, but thats quite annoying.
 -(NSError *)loadShieldsFile {
     NSError *error = nil;
-    NSData *data = [NSData dataWithContentsOfFile:@"/private/var/mobile/Library/Application Support/com.skyglow.mapsx/shield_maps.dat" options:0 error:&error];
+    NSData *data = [NSData dataWithContentsOfFile:@"/private/var/mobile/Library/Caches/GeoServices/shield_maps.dat" options:0 error:&error];
     if (error) {
         NSLog(@"an error occured loading the shield maps! error: %@", error);
         return error;
@@ -91,7 +91,7 @@
         NSLog(@"[MapsX] Failed to parse downloaded shield maps!!!");
         return;
     }
-    [self->_recievedData writeToFile:@"/private/var/mobile/Library/Application Support/com.skyglow.mapsx/shield_maps.dat" atomically:YES];
+    [self->_recievedData writeToFile:@"/private/var/mobile/Library/Caches/GeoServices/shield_maps.dat" atomically:YES];
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {

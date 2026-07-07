@@ -54,18 +54,18 @@ static SCNetworkReachabilityRef reachabilityRef;
 
 %end
 
-%hook VKPShieldIndex
+// %hook VKPShieldIndex
 
--(NSString*)artworkIdentifierForShieldType:(int)shieldType
-{
-    // return %orig(8420);
-    id orig = %orig;
-    if (!orig) {
-        NSLog(@"sdid(%i)", shieldType);
-    }
-    return orig;
-}
-%end
+// -(NSString*)artworkIdentifierForShieldType:(int)shieldType
+// {
+//     // return %orig(8420);
+//     id orig = %orig;
+//     if (!orig) {
+//         NSLog(@"sdid(%i)", shieldType);
+//     }
+//     return orig;
+// }
+// %end
 
 %hook VKShieldManager
 -(id)init {
@@ -115,7 +115,7 @@ static SCNetworkReachabilityRef reachabilityRef;
 -(id)iconForFeatureID:(uint64_t)featureId withResourceNames:(id)resourceNames style:(void*)style {
     int newIconID = [[GEOShieldMappingManager sharedManager] translateIconMap:featureId];
     if (newIconID == 0)  {
-        NSLog(@"icid(%llu)", featureId);
+        // NSLog(@"icid(%llu)", featureId);
         return %orig();
     } 
     return %orig(newIconID, resourceNames, style);

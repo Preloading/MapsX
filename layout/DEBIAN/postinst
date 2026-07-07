@@ -1,6 +1,3 @@
 #!/bin/bash
 echo Restarting geod...
 killall -9 geod || true
-mkdir /private/var/mobile/Library/Application\ Support/com.skyglow.mapsx/  >/dev/null 2>&1 || true
-chmod -R 755 /private/var/mobile/Library/Application\ Support/com.skyglow.mapsx/
-chown mobile:mobile /private/var/mobile/Library/Application\ Support/com.skyglow.mapsx/
