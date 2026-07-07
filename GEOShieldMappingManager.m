@@ -47,7 +47,7 @@
 // loads the shield data from a cache file. this should probably be used for the geo resource stuff, but thats quite annoying.
 -(NSError *)loadShieldsFile {
     NSError *error = nil;
-    NSData *data = [NSData dataWithContentsOfFile:@"/private/var/mobile/Library/Caches/GeoServices/Resources/shield_maps.dat" options:0 error:&error];
+    NSData *data = [NSData dataWithContentsOfFile:@"/private/var/mobile/Library/Application Support/com.skyglow.mapsx/shield_maps.dat" options:0 error:&error];
     if (error) {
         NSLog(@"an error occured loading the shield maps! error: %@", error);
         return error;
@@ -89,8 +89,9 @@
     NSError *error = [self loadMappingsFromData:self->_recievedData];
     if (error) {
         NSLog(@"[MapsX] Failed to parse downloaded shield maps!!!");
+        return;
     }
-    [self->_recievedData writeToFile:@"/private/var/mobile/Library/Caches/GeoServices/Resources/shield_maps.dat" atomically:YES];
+    [self->_recievedData writeToFile:@"/private/var/mobile/Library/Application Support/com.skyglow.mapsx/shield_maps.dat" atomically:YES];
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {

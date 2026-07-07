@@ -20,7 +20,7 @@ MapsX_FILES = Tweak.x \
 			shieldmap-protobuf/GEOXShieldMap.m \
 			attribution.x
 MapsX_CFLAGS = -fobjc-arc
-MapsX_FRAMEWORKS = Foundation CoreFoundation
+MapsX_FRAMEWORKS = Foundation CoreFoundation SystemConfiguration
 MapsX_PRIVATE_FRAMEWORKS = ProtocolBuffer GeoServices VectorKit
 
 include $(THEOS_MAKE_PATH)/tweak.mk

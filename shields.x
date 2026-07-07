@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <malloc/malloc.h>
 #import <substrate.h>
+#import <SystemConfiguration/SystemConfiguration.h>
 #import "GEOShieldMappingManager.h"
 
 typedef struct PointsStruct {
@@ -27,10 +28,27 @@ typedef struct {
 @interface VKShieldAtlas : NSObject
 @end
 
+static void ReachabilityCallback(SCNetworkReachabilityRef target,
+                                  SCNetworkReachabilityFlags flags,
+                                  void *info) {
+    BOOL reachable = (flags & kSCNetworkReachabilityFlagsReachable) &&
+                      !(flags & kSCNetworkReachabilityFlagsConnectionRequired);
+
+    if (reachable) {
+        [GEOShieldMappingManager cacheToFile];
+    }
+}
+
+static SCNetworkReachabilityRef reachabilityRef;
+
 %hook GEOResourceManifestServer 
 
 -(void)init {
-    [GEOShieldMappingManager cacheToFile];
+    reachabilityRef = SCNetworkReachabilityCreateWithName(NULL, "www.apple.com");
+
+    SCNetworkReachabilityContext context = {0, NULL, NULL, NULL, NULL};
+    SCNetworkReachabilitySetCallback(reachabilityRef, ReachabilityCallback, &context);
+    SCNetworkReachabilityScheduleWithRunLoop(reachabilityRef, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
     %orig;
 }
 
