@@ -4,8 +4,8 @@
 // --- Map Message ---
 @interface MapMessage : NSObject
 
-@property (nonatomic, assign) uint32_t currentId;
-@property (nonatomic, assign) uint32_t oldId;
+@property (nonatomic, assign) uint64_t currentId;
+@property (nonatomic, assign) uint64_t oldId;
 
 - (BOOL)readFrom:(PBDataReader *)reader;
 @end
@@ -13,7 +13,7 @@
 // --- Ignore Message ---
 @interface IgnoreMessage : NSObject
 
-@property (nonatomic, assign) uint32_t id;
+@property (nonatomic, assign) uint64_t id;
 
 - (BOOL)readFrom:(PBDataReader *)reader;
 @end

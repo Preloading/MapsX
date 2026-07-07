@@ -13,7 +13,7 @@
 -(NSError *)loadShieldsFile;
 -(NSError*)loadMappingsFromData:(NSData*)data;
 -(int)translateShieldMap:(int)map;
--(int)translateIconMap:(int)map;
+-(int)translateIconMap:(uint64_t)map;
 +(void)initForUse;
 +(void)cacheToFile;
 @end

@@ -9,10 +9,10 @@
         
         switch (tag) {
             case 1: 
-                self.currentId = [reader readUint32]; 
+                self.currentId = [reader readUint64]; 
                 break;
             case 2: 
-                self.oldId = [reader readUint32]; 
+                self.oldId = [reader readUint64]; 
                 break;
             default:
                 break;
@@ -30,7 +30,7 @@
         
         switch (tag) {
             case 1: 
-                self.id = [reader readUint32]; 
+                self.id = [reader readUint64]; 
                 break;
             default: 
                 break;

@@ -23,7 +23,18 @@
 
 +(void)initForUse {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [[self sharedManager] loadShieldsFile];
+        NSError *error = [[self sharedManager] loadShieldsFile];
+        if (error) {
+            NSLog(@"[MapsX] failed to load shield maps!!! error -> %@, retrying in two seconds...", error);
+            [NSTimer scheduledTimerWithTimeInterval:2.0
+                target:[self sharedManager]
+                selector:@selector(loadShieldsFile)
+                userInfo:nil
+                repeats:NO];
+
+        } else {
+            NSLog(@"[MapsX] loaded shield maps version %i", [self sharedManager]->_dataVersion);
+        }
     });
 }
 
@@ -77,7 +88,7 @@
     self->_hasFetchedFromOnline = YES;
     NSError *error = [self loadMappingsFromData:self->_recievedData];
     if (error) {
-        NSLog(@"[MapsX] Failed to parse shield maps!!!");
+        NSLog(@"[MapsX] Failed to parse downloaded shield maps!!!");
     }
     [self->_recievedData writeToFile:@"/private/var/mobile/Library/Caches/GeoServices/Resources/shield_maps.dat" atomically:YES];
 }
@@ -93,11 +104,20 @@
     BOOL success = [pack readFrom:reader];
     
     if (success && ![reader hasError]) {
+        // shield maps
         NSMutableDictionary *shieldMaps = [[NSMutableDictionary alloc] initWithCapacity:pack.shields.count];
         for (MapMessage *message in pack.shields) {
             shieldMaps[@(message.currentId)] = @(message.oldId);
         }
         self->_shieldMappings = [shieldMaps copy];
+
+        // icon maps
+        NSMutableDictionary *iconMaps = [[NSMutableDictionary alloc] initWithCapacity:pack.shields.count];
+        for (MapMessage *message in pack.icons) {
+            iconMaps[@(message.currentId)] = @(message.oldId);
+        }
+        self->_iconMappings = [iconMaps copy];
+
         self->_dataVersion = pack.version;
     } else {
         return [NSError errorWithDomain:@"com.skyglow.mapsx.shields" code:49 userInfo:nil];
@@ -109,7 +129,7 @@
 -(int)translateShieldMap:(int)map {
     return [self->_shieldMappings[@(map)] integerValue];
 }
--(int)translateIconMap:(int)map {
+-(int)translateIconMap:(uint64_t)map {
     return [self->_iconMappings[@(map)] integerValue];
 }
 
