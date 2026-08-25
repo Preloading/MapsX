@@ -235,6 +235,29 @@ static void earcutLinked(Earcut *e, Node *ear, int pass) {
     }
 }
 
+
+@interface VGLVertexArrayObject : NSObject <NSCoding> {
+	unsigned _VAO;
+	unsigned _VBO;
+	unsigned _EBO[2];
+	int _stride;
+	id _attributes;
+    @public
+	int _vertexCount;
+    @public
+	int _indexCount[2];
+	int _vertexPrimitiveType[2];
+	unsigned _indexBufferMode;
+	unsigned _bindedIndexBuffer;
+	unsigned _indicesDirty : 1;
+	unsigned _verticesDirty : 1;
+	unsigned _vertexUsage : 2;
+	unsigned _indexUsage : 2;
+	unsigned _attributeCount : 8;
+}
+@end
+
+%group EnablePolygonPatches
 %hook VKTriangulator
 
 - (NSMutableData *)triangulateIndicesForPoints:(PointsStruct *)points pointCount:(int)pointCount {
@@ -293,26 +316,6 @@ static void earcutLinked(Earcut *e, Node *ear, int pass) {
 
 %end
 
-@interface VGLVertexArrayObject : NSObject <NSCoding> {
-	unsigned _VAO;
-	unsigned _VBO;
-	unsigned _EBO[2];
-	int _stride;
-	id _attributes;
-    @public
-	int _vertexCount;
-    @public
-	int _indexCount[2];
-	int _vertexPrimitiveType[2];
-	unsigned _indexBufferMode;
-	unsigned _bindedIndexBuffer;
-	unsigned _indicesDirty : 1;
-	unsigned _verticesDirty : 1;
-	unsigned _vertexUsage : 2;
-	unsigned _indexUsage : 2;
-	unsigned _attributeCount : 8;
-}
-@end
 %hook VGLVertexArrayObject
 
 - (unsigned short*)reserveIndices:(int)requestedCount {
@@ -328,3 +331,10 @@ static void earcutLinked(Earcut *e, Node *ear, int pass) {
 }
 
 %end
+%end
+
+%ctor {
+	if (kCFCoreFoundationVersionNumber <= 847.27) {
+		%init(EnablePolygonPatches);
+	}
+}
