@@ -7,7 +7,7 @@
     id originalURL = %orig;
     NSLog(@"Original Manifest URL: %@", originalURL);
 
-    NSString *newURLString = @"https://gsp21.ls.apple.com/config/prod-resources-hidpi-20";
+    NSString *newURLString = @"http://gspe21-ssl.ls.apple.com/config/prod-resources-hidpi-20";
 
     // Return the new URL
     return newURLString;
@@ -59,7 +59,7 @@ NSString *URLPatches(NSString *baseURL) {
 
 -(id)resourcesURL {
     // NSLog(@"resourcesURL -> %@", %orig); // originally https://gspe21-ssl.ls.apple.com/
-    return @"https://gsp21.ls.apple.com/";
+    return @"http://gspe21-ssl.ls.apple.com/";
 }
 
 

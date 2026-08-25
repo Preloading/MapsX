@@ -33,7 +33,7 @@
                 repeats:NO];
 
         } else {
-            NSLog(@"[MapsX] loaded shield maps version %i", [self sharedManager]->_dataVersion);
+            NSLog(@"[MapsX] loaded shield maps version %i", [[self sharedManager] dataVersion]);
         }
     });
 }
