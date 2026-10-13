@@ -342,11 +342,11 @@ static void earcutLinked(Earcut *e, Node *ear, int pass) {
 
 - (int)tileStyleForMapLayer:(unsigned int)layer {
     int s = %orig;
-    if (s == 18) return 20;
+    if (s == 18) return 20; // style 18 is no longer available. this is for the road name balloons. style 20 works fine for this.
     return s;
 }
 
-- (void)configureTileSources {
+- (void)configureTileSources { // disabling the realistic tiles, so it just displays the regular tiles. this just stops it from transitioning to the dead tiles. couldn't get this one fixed with a rewrite.
     Ivar iv = class_getInstanceVariable(object_getClass(self), "_activeMapLayers");
     if (iv) {
         char *layers = (char *)(__bridge void *)self + ivar_getOffset(iv);

@@ -157,8 +157,7 @@ static NSString *resolveURL(uint32_t field) {
     NSString *host = request.URL.host;
     NSString *path = request.URL.path;
     if (![host isEqualToString:@"gspa21.ls.apple.com"]) return NO;
-    return [path isEqualToString:@"/config/search-attribution-1"] ||
-    [path isEqualToString:@"/config/com.apple.GEO.BusinessLocalizedCategories-1.plist"];
+    return [path isEqualToString:@"/config/search-attribution-1"] || [path isEqualToString:@"/config/com.apple.GEO.BusinessLocalizedCategories-1.plist"];
 }
 
 + (NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request {
@@ -167,7 +166,7 @@ static NSString *resolveURL(uint32_t field) {
 
 - (void)startLoading {
     NSURL *original = self.request.URL;
-    uint32_t field = [original.path isEqualToString:@"/config/search-attribution-1"] ? 33 : 55;
+    uint32_t field = [original.path isEqualToString:@"/config/search-attribution-1"] ? 33 : 55; // tag 33 is the search attribution url string, 55 is the one for the business categories
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSString *resolved = resolveURL(field);
