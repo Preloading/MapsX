@@ -20,7 +20,8 @@ MapsX_FILES = Tweak.x \
 			shieldmap-protobuf/GEOXShieldMap.m \
 			attribution.x \
 			pois.x \
-			polygons.xm
+			polygons.xm \
+			satellite.x
 MapsX_CFLAGS = -fobjc-arc -Wno-gcc-compat
 MapsX_FRAMEWORKS = Foundation CoreFoundation SystemConfiguration
 MapsX_PRIVATE_FRAMEWORKS = ProtocolBuffer GeoServices VectorKit
