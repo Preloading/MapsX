@@ -44,7 +44,7 @@
     GEOAttribution *attribution = [[%c(GEOAttribution) alloc] init];
     [attribution setName:@"TomTom"];
     [attribution setLogo:@"tomtom-2@2x.png"];
-    [attribution setUrl:@"https://gspe21-ssl.ls.apple.com/html/attribution-315.html"];// may change but ehhS
+    [attribution setUrl:@"https://gspe21-ssl.ls.apple.com/html/attribution.html"];// may change but ehhS
     return attribution;
 }
 
@@ -52,7 +52,7 @@
     GEOAttribution *attribution = [[%c(GEOAttribution) alloc] init];
     [attribution setName:@"TomTom"];
     [attribution setLogo:@"tomtom-2@2x.png"];
-    [attribution setUrl:@"https://gspe21-ssl.ls.apple.com/html/attribution-315.html"];// may change but ehhS
+    [attribution setUrl:@"https://gspe21-ssl.ls.apple.com/html/attribution.html"];// may change but ehhS
     return [@[attribution] mutableCopy];
 }
 
@@ -65,7 +65,7 @@
     GEOAttribution *attribution = [[%c(GEOAttribution) alloc] init];
     [attribution setName:@"TomTom"];
     [attribution setLogo:@"tomtom-2@2x.png"];
-    [attribution setUrl:@"https://gspe21-ssl.ls.apple.com/html/attribution-315.html"];// may change but ehhS
+    [attribution setUrl:@"https://gspe21-ssl.ls.apple.com/html/attribution.html"];// may change but ehhS
     return [@[attribution] mutableCopy];
 }
 

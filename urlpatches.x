@@ -5,7 +5,7 @@
 
 - (id)_manifestURL {
     id originalURL = %orig;
-    NSLog(@"Original Manifest URL: %@", originalURL);
+    NSLog(@"[MapsX] Original Manifest URL: %@", originalURL);
 
     NSString *newURLString = @"http://gspe21-ssl.ls.apple.com/config/prod-resources-hidpi-20";
 
