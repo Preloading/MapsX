@@ -125,7 +125,7 @@ static SCNetworkReachabilityRef reachabilityRef;
 -(id)artworkForFeatureID:(uint64_t)featureId withResourceNames:(id)resourceNames style:(void*)style contentScale:(double)contentScale {
     int newIconID = [[GEOShieldMappingManager sharedManager] translateIconMap:featureId];
     if (newIconID == 0)  {
-        NSLog(@"icid(%llu)", featureId);
+        NSLog(@"[MapsX] icid(%llu)", featureId);
         return %orig();
     } 
     return %orig(newIconID, resourceNames, style, contentScale);

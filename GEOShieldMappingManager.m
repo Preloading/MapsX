@@ -49,7 +49,7 @@
     NSError *error = nil;
     NSData *data = [NSData dataWithContentsOfFile:@"/private/var/mobile/Library/Caches/GeoServices/shield_maps.dat" options:0 error:&error];
     if (error) {
-        NSLog(@"an error occured loading the shield maps! error: %@", error);
+        NSLog(@"[MapsX] an error occured loading the shield maps! error: %@", error);
         return error;
     }
 

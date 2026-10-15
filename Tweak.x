@@ -67,7 +67,7 @@ typedef struct GEOTileKey {
 %hook GEOResourceLoader
 
 -(id)initWithTileGroupIdentifier:(int)groupIdentifier uniqueIdentifier:(id)uniqueIdentifier targetDirectory:(id)targetDirectory baseURLString:(NSString*)baseURLString isFirstLoad:(BOOL)isFirstLoad {
-    NSLog(@"Resource Loader URL: %@", baseURLString);
+    NSLog(@"[MapsX] Resource Loader URL: %@", baseURLString);
     return %orig;
 }
 
@@ -86,7 +86,7 @@ typedef struct GEOTileKey {
 %hook GEONameInfo 
 -(NSString*)shield {
     id orig = %orig;
-    NSLog(@"shield = %@", orig);
+    NSLog(@"[MapsX] shield = %@", orig);
     return orig;
 }
 %end
@@ -95,7 +95,7 @@ typedef struct GEOTileKey {
 %hook GEOVFeature
 -(id)shieldLabelTypes {
     id orig = %orig;
-    NSLog(@"shieldTypes = %@", orig);
+    NSLog(@"[MapsX] shieldTypes = %@", orig);
     return orig;
 }
 %end
