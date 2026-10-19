@@ -23,7 +23,7 @@ MapsX_FILES = Tweak.x \
 			polygons.xm \
 			satellite.x
 MapsX_CFLAGS = -fobjc-arc -Wno-gcc-compat
-MapsX_FRAMEWORKS = Foundation CoreFoundation SystemConfiguration
+MapsX_FRAMEWORKS = Foundation CoreFoundation SystemConfiguration UIKit
 MapsX_PRIVATE_FRAMEWORKS = ProtocolBuffer GeoServices VectorKit
 
 include $(THEOS_MAKE_PATH)/tweak.mk

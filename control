@@ -1,6 +1,6 @@
 Package: com.skyglow.mapsx
 Name: MapsX
-Version: 5.1.0
+Version: 5.1.1
 Architecture: iphoneos-arm
 Description: This tweak fixes Apple Maps and any MapView in the system (asking Siri for location...).
 Maintainer: Requis, Preloading, Pod
