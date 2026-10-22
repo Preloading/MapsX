@@ -43,7 +43,7 @@
 -(id)attributionAtIndex:(int)index {
     GEOAttribution *attribution = [[%c(GEOAttribution) alloc] init];
     [attribution setName:@"TomTom"];
-    [attribution setLogo:@"tomtom-2@2x.png"];
+    [attribution setLogo:@"../../../../../../../../Library/Application Support/com.skyglow.mapsx/tomtom-2@2x.png"];
     [attribution setUrl:@"https://gspe21-ssl.ls.apple.com/html/attribution.html"];// may change but ehhS
     return attribution;
 }
@@ -51,7 +51,7 @@
 -(id)attributions {
     GEOAttribution *attribution = [[%c(GEOAttribution) alloc] init];
     [attribution setName:@"TomTom"];
-    [attribution setLogo:@"tomtom-2@2x.png"];
+    [attribution setLogo:@"../../../../../../../../Library/Application Support/com.skyglow.mapsx/tomtom-2@2x.png"];
     [attribution setUrl:@"https://gspe21-ssl.ls.apple.com/html/attribution.html"];// may change but ehhS
     return [@[attribution] mutableCopy];
 }
@@ -64,7 +64,7 @@
 {
     GEOAttribution *attribution = [[%c(GEOAttribution) alloc] init];
     [attribution setName:@"TomTom"];
-    [attribution setLogo:@"tomtom-2@2x.png"];
+    [attribution setLogo:@"../../../../../../../../Library/Application Support/com.skyglow.mapsx/tomtom-2@2x.png"];
     [attribution setUrl:@"https://gspe21-ssl.ls.apple.com/html/attribution.html"];// may change but ehhS
     return [@[attribution] mutableCopy];
 }

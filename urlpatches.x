@@ -8,7 +8,7 @@
     id originalURL = %orig;
     NSLog(@"[MapsX] Original Manifest URL: %@", originalURL);
 
-    NSString *newURLString = ([[UIScreen mainScreen] scale] == 1.0) ? @"http://gspe21-ssl.ls.apple.com/config/prod-resources-lodpi-20" : @"http://gspe21-ssl.ls.apple.com/config/prod-resources-hidpi-20";
+    NSString *newURLString = ([originalURL rangeOfString:@"hidpi"].location != NSNotFound) ? @"http://gspe21-ssl.ls.apple.com/config/prod-resources-hidpi-20" : @"http://gspe21-ssl.ls.apple.com/config/prod-resources-lodpi-20";
 
     // Return the new URL
     return newURLString;
