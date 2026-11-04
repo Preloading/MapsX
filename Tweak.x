@@ -62,6 +62,16 @@ typedef struct GEOTileKey {
 // %end
 
 
+%hook GEOCountryConfiguration
+
+-(NSString *)countryCode {
+	NSString *orig = %orig;
+	NSLog(@"[MapsX] Country code: %@", orig);
+	return @"US";
+}
+
+%end
+
 
 
 %hook GEOResourceLoader
