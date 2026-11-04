@@ -67,7 +67,7 @@ typedef struct GEOTileKey {
 -(NSString *)countryCode {
 	NSString *orig = %orig;
 	NSLog(@"[MapsX] Country code: %@", orig);
-	return @"US";
+	return @"US"; // make it use US even if the user isn't in the US because MapsX is designed for the main provider; some countries like China have their own rules defined in the network defaults configuration, which may break MapsX's functionality
 }
 
 %end
