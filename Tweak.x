@@ -67,7 +67,7 @@ typedef struct GEOTileKey {
 -(NSString *)countryCode {
 	NSString *orig = %orig;
 	NSLog(@"[MapsX] Country code: %@", orig);
-	return @"US"; // make it use US even if the user isn't in the US because MapsX is designed for the main provider; some countries like China have their own rules defined in the network defaults configuration, which may break MapsX's functionality
+	if ([orig isEqualToString:@"CN"]) return @"US"; // return US if user is in China because China has their own Apple Maps servers, which don't fully work with MapsX
 }
 
 %end
