@@ -2,7 +2,7 @@ TARGET := iphone:clang:latest:6.0
 export TARGET=iphone:clang:7.0
 INSTALL_TARGET_PROCESSES = geod Maps
 
-ARCHS = armv7 armv7s arm64
+ARCHS = armv7
 
 include $(THEOS)/makefiles/common.mk
 
@@ -21,9 +21,13 @@ MapsX_FILES = Tweak.x \
 			attribution.x \
 			pois.x \
 			polygons.xm \
+			landmark3d.xm \
 			satellite.x
-MapsX_CFLAGS = -fobjc-arc -Wno-gcc-compat
-MapsX_FRAMEWORKS = Foundation CoreFoundation SystemConfiguration UIKit
+
+MapsX_LIBRARIES = heif de265 c++
+MapsX_CFLAGS = -fobjc-arc -Wno-gcc-compat -Ilib/libheif/include
+MapsX_LDFLAGS = -Llib/libheif/lib -Llib/libde265/lib
+MapsX_FRAMEWORKS = Foundation CoreFoundation SystemConfiguration UIKit CoreGraphics
 MapsX_PRIVATE_FRAMEWORKS = ProtocolBuffer GeoServices VectorKit
 
 include $(THEOS_MAKE_PATH)/tweak.mk
