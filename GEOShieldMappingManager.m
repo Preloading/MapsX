@@ -22,20 +22,21 @@
 }
 
 +(void)initForUse {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSError *error = [[self sharedManager] loadShieldsFile];
-        if (error) {
-            NSLog(@"[MapsX] failed to load shield maps!!! error -> %@, retrying in four seconds...", error);
+    // first try at loading is blocking so we don't get some sad shields
+    NSError *error = [[self sharedManager] loadShieldsFile];
+    if (error) {
+        NSLog(@"[MapsX] failed to load shield maps!!! error -> %@, retrying in four seconds...", error);
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             [NSTimer scheduledTimerWithTimeInterval:4.0
                 target:[self sharedManager]
                 selector:@selector(loadShieldsFile)
                 userInfo:nil
                 repeats:NO];
+        });
 
-        } else {
-            NSLog(@"[MapsX] loaded shield maps version %i", [[self sharedManager] dataVersion]);
-        }
-    });
+    } else {
+        NSLog(@"[MapsX] loaded shield maps version %i", [[self sharedManager] dataVersion]);
+    }
 }
 
 +(void)cacheToFile {
