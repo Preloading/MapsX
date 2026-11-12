@@ -20,25 +20,6 @@
 // -(VGLColor)textureCoordinateRect:(CGRect)arg1 ;
 @end
 
-
-
-// %hookf(int, VKA3DPopulateMesh, VGLMultiTexturedMesh *multitextureMesh, char *meshData, int a3) {
-%hookf(int, VKA3DPopulateMesh, id multitextureMesh, char *meshData, int len) {
-    // NSLog(@"mesh data -> %@", [NSData dataWithBytes:meshData length:len]);
-    // NSLog(@"a3 -> %i", a3);
-    %orig;
-    return 1;
-}
-
-%hook VGLCompressedTexture 
-
--(id)initWithData:(NSData*)data {
-    NSLog(@"compressed texture data found!");
-    return %orig;
-}
-
-%end
-
 @interface VGLUncompressedTexture (MapsX)
 -(CGImageRef)decompressImage:(NSData*)heifData;
 @end
@@ -53,7 +34,7 @@
     NSData *imgDataStart = [data subdataWithRange:NSMakeRange(0,16)];
     // NSLog(@"%@ vs %@", heicSignature, imgDataStart);
     if ([heicSignature isEqualToData:imgDataStart]) {
-        NSLog(@"HEIC texture detected!");
+        // NSLog(@"HEIC texture detected!");
 
         CGImageRef decompressedImg = [self decompressImage:data];
         VGLUncompressedTexture *texture = [self initWithCGImage:decompressedImg];
@@ -134,7 +115,7 @@
 
 %end
 
-%ctor {
-    NSLog(@"3d mesh");
-    %init(VKA3DPopulateMesh=MSFindSymbol(NULL, "_VKA3DPopulateMesh"));
-}
+// %ctor {
+//     NSLog(@"3d mesh");
+//     %init(VKA3DPopulateMesh=MSFindSymbol(NULL, "_VKA3DPopulateMesh"));
+// }
