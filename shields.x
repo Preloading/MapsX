@@ -56,15 +56,25 @@ static SCNetworkReachabilityRef reachabilityRef;
 
 // %hook VKPShieldIndex
 
-// -(NSString*)artworkIdentifierForShieldType:(int)shieldType
-// {
-//     // return %orig(8420);
-//     id orig = %orig;
-//     if (!orig) {
-//         NSLog(@"sdid(%i)", shieldType);
-//     }
-//     return orig;
+// -(id)addEntries:(id)entries {
+//     [GEOShieldMappingManager initForUse];
+//     return %orig;
 // }
+
+// -(id)artworkIdentifierForShieldType:(int)shieldType
+// {
+//     int newShieldID = [[GEOShieldMappingManager sharedManager] translateShieldMap:shieldType];
+//     if (newShieldID == 0) return %orig;
+//     return %orig(newShieldID);
+// }
+
+// // iOS 7
+// -(id)artworkIdentifierForShieldType:(int)shieldType textSpecificIdentifiers:(void **)textSpecificIdentifiers {
+//     int newShieldID = [[GEOShieldMappingManager sharedManager] translateShieldMap:shieldType];
+//     if (newShieldID == 0) return %orig;
+//     return %orig(newShieldID, textSpecificIdentifiers);
+// }
+
 // %end
 
 %hook VKShieldManager
@@ -92,7 +102,7 @@ static SCNetworkReachabilityRef reachabilityRef;
     // NSLog(@"shield type -> %i", shieldType);
     int newShieldID = [[GEOShieldMappingManager sharedManager] translateShieldMap:shieldType];
     if (newShieldID == 0) return %orig(shieldType, textLen, contentScale, resourceNames, style, size, idiom, numberOfLines);
-    NSLog(@"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    NSLog(@"[MapsX] aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
     return %orig(newShieldID, textLen, contentScale, resourceNames, style, size, idiom, numberOfLines);
 }

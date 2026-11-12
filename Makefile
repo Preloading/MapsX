@@ -1,5 +1,4 @@
-TARGET := iphone:clang:latest:6.0
-export TARGET=iphone:clang:7.0
+TARGET := iphone:clang:7.0:6.0
 INSTALL_TARGET_PROCESSES = geod Maps
 
 ARCHS = armv7 armv7s arm64
@@ -21,8 +20,9 @@ MapsX_FILES = Tweak.x \
 			attribution.x \
 			pois.x \
 			polygons.xm \
-			satellite.x
-MapsX_CFLAGS = -fobjc-arc -Wno-gcc-compat
+			satellite.x \
+			directionmaps.x
+MapsX_CFLAGS = -fobjc-arc -Wno-gcc-compat -Wno-unused-function
 MapsX_FRAMEWORKS = Foundation CoreFoundation SystemConfiguration UIKit
 MapsX_PRIVATE_FRAMEWORKS = ProtocolBuffer GeoServices VectorKit
 

@@ -340,7 +340,7 @@ static void earcutLinked(Earcut *e, Node *ear, int pass) {
 %end
 
 %ctor {
-	if (kCFCoreFoundationVersionNumber <= 847.27) {
+	if (kCFCoreFoundationVersionNumber <= 847.27) { // only do it for ios 7 and lower cause ios 8 and later have a capable parser
 		%init(EnablePolygonPatches);
 	}
 }

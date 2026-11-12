@@ -85,7 +85,7 @@ NSString *customURLEncode(NSString *string) {
     NSURL *url = [NSURL URLWithString:queryURL];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
                                                            cachePolicy:NSURLRequestUseProtocolCachePolicy
-                                                       timeoutInterval:60.0];
+                                                       timeoutInterval:7.0];
     
     [request setHTTPMethod:@"GET"];
     [request addValue:[NSString stringWithFormat:@"Bearer %@", token] forHTTPHeaderField:@"Authorization"];
