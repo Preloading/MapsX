@@ -20,10 +20,14 @@ MapsX_FILES = Tweak.x \
 			attribution.x \
 			pois.x \
 			polygons.xm \
-			satellite.x \
-			directionmaps.x
-MapsX_CFLAGS = -fobjc-arc -Wno-gcc-compat -Wno-unused-function
-MapsX_FRAMEWORKS = Foundation CoreFoundation SystemConfiguration UIKit
+			landmark3d.xm \
+			directionmaps.x \
+			satellite.x
+
+MapsX_LIBRARIES = heif de265 c++
+MapsX_CFLAGS = -fobjc-arc -Wno-gcc-compat -Ilib/libheif/include
+MapsX_LDFLAGS = -Llib/libheif/lib -Llib/libde265/lib
+MapsX_FRAMEWORKS = Foundation CoreFoundation SystemConfiguration UIKit CoreGraphics
 MapsX_PRIVATE_FRAMEWORKS = ProtocolBuffer GeoServices VectorKit
 
 include $(THEOS_MAKE_PATH)/tweak.mk

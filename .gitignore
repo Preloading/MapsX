@@ -7,3 +7,5 @@ Archival_Effort/
 .clangd
 compile_commands.json
 .vscode
+lib/libheif/install/lib
+lib/libde265/install/lib

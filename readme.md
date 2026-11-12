@@ -10,6 +10,9 @@ Download and install the tweak from my Cydia repo:
 https://cydia.skyglow.es
 
 ### Contributors
-- **ObscureMosquito/Requis/Me**: Made the tweak
-- **Preloading**: Updated it to use the new method!
-- **Pod**: Discovered the new method!
+- **ObscureMosquito/Requis**: Original Author
+- **Preloading**: Researching how maps works internally for a variety of systems, rewrote the tweak twice ig.
+- **Pod**: Too many things, researching many fixes for how Apple Maps works, fixing polygons, satelite, etc.
+
+### Special thanks
+- **TheComputerNerd88's MapSatFix**: Used as a refrence for other HEIC based systems in Apple Maps
