@@ -130,7 +130,7 @@
     NSURL *url = [NSURL URLWithString:duckDuckGoTokenURL];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url 
                                                           cachePolicy:NSURLRequestUseProtocolCachePolicy 
-                                                      timeoutInterval:60.0];
+                                                      timeoutInterval:5.0];
     
     [request setHTTPMethod:@"GET"];
     
@@ -164,7 +164,7 @@
     url = [NSURL URLWithString:appleTokenURL];
     request = [NSMutableURLRequest requestWithURL:url 
                                      cachePolicy:NSURLRequestUseProtocolCachePolicy 
-                                 timeoutInterval:60.0];
+                                 timeoutInterval:6.0];
     
     [request setHTTPMethod:@"GET"];
     [request setValue:[NSString stringWithFormat:@"Bearer %@", duckduckgotoken] forHTTPHeaderField:@"Authorization"];

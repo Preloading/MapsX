@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 
+%group AltitudePatches
 %hook GEOResourceManager
 
 -(NSData *)dataForResourceWithName:(NSString *)name fallbackBundle:(NSBundle *)bundle {
@@ -17,3 +18,10 @@
 }
 
 %end
+%end
+
+%ctor {
+    if (kCFCoreFoundationVersionNumber < 847.20) { // only for ios 6 since it works fine on ios 7 and later
+        %init(AltitudePatches);
+    }
+}

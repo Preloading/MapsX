@@ -1,5 +1,4 @@
-TARGET := iphone:clang:latest:6.0
-export TARGET=iphone:clang:7.0
+TARGET := iphone:clang:7.0:6.0
 INSTALL_TARGET_PROCESSES = geod Maps
 
 ARCHS = armv7 armv7s arm64
@@ -22,6 +21,7 @@ MapsX_FILES = Tweak.x \
 			pois.x \
 			polygons.xm \
 			landmark3d.xm \
+			directionmaps.x \
 			satellite.x
 
 MapsX_LIBRARIES = heif de265 c++
