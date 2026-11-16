@@ -1,8 +1,6 @@
 #import <Foundation/Foundation.h>
 #import "GeoHeaders.h"
-#import <CFNetwork/CFNetwork.h>
 
-%group PhotosFix
 static NSMutableArray *muids = nil;
 
 %hook GEOBusiness
@@ -35,12 +33,21 @@ static NSMutableArray *muids = nil;
     request.HTTPMethod = @"POST";
     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     request.HTTPBody = requestBody;
-    // awkward choice. don't want to make it too short in case the user's internet connection sucks. but i also don't want to make it too long, else the ui would hang.
-    request.timeoutInterval = 3.5;
-    // synchronous on the main thread?? yeah! if it's asynchronous, there's a chance a race condition will occur. the rest of the business info could load up before the data comes back, causing photos to not be shown until you re-opened the location.
-    NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+    request.timeoutInterval = 4;
+    __block NSData *responseData = nil;
+    __block BOOL done = NO;
+    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+    [NSURLConnection sendAsynchronousRequest:request queue:queue completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        if (!error) responseData = data;
+        done = YES;
+    }];
+    NSDate *deadline = [NSDate dateWithTimeIntervalSinceNow:5];
+    while (!done && [deadline timeIntervalSinceNow] > 0) {
+        if (![[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.05]]) [NSThread sleepForTimeInterval:0.01];
+    }
     if (!responseData) return orig;
     NSDictionary *responseJSON = [NSJSONSerialization JSONObjectWithData:responseData options:0 error:nil];
+    if (![responseJSON isKindOfClass:[NSDictionary class]]) return orig;
     NSMutableDictionary *placesByMuid = [NSMutableDictionary dictionary];
     for (NSDictionary *place in responseJSON[@"places"]) placesByMuid[place[@"muid"]] = place;
     // size is an enum, rather than a pixel size. confusing. 8 is large, 4 is medium.
@@ -96,16 +103,3 @@ static NSMutableArray *muids = nil;
 }
 
 %end
-%end
-
-%ctor {
-    BOOL hasTLSFix = [[NSFileManager defaultManager] fileExistsAtPath:@"/Library/MobileSubstrate/DynamicLibraries/tlsfix.dylib"];
-    NSDictionary *proxySettings = CFBridgingRelease(CFNetworkCopySystemProxySettings());
-    BOOL hasProxy = [proxySettings[@"HTTPEnable"] boolValue] || [proxySettings[@"HTTPSEnable"] boolValue] || [proxySettings[@"ProxyAutoConfigEnable"] boolValue];
-    if (hasTLSFix) NSLog(@"[MapsX] TLSFix detected!");
-    if (hasProxy) NSLog(@"[MapsX] Proxy detected!");
-    if (hasTLSFix || hasProxy) {
-        %init(PhotosFix);
-    }
-    else NSLog(@"[MapsX] TLSFix does not appear to be installed, nor does there seem to be a proxy configured. Photos fix may not work!");
-}
