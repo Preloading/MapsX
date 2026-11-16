@@ -226,7 +226,6 @@
 }
 @end
 
-
 @interface GEODirectionsRequest : PBRequest
 {
     GEOMapRegion *_currentMapRegion;
@@ -245,4 +244,33 @@
         unsigned int timeSinceLastRerouteRequest:1;
     } _has;
 }
+@end
+
+@interface GEOPhotoInfo : PBCodable
+- (void)setUrl:(NSString *)url;
+- (void)setSize:(int)size;
+@end
+
+@interface GEOPhoto : PBCodable
+- (void)setUid:(NSString *)uid;
+- (void)setPhotoType:(int)photoType;
+- (void)setPhotoInfos:(NSMutableArray *)photoInfos;
+@end
+
+@interface GEOBusiness : PBCodable
+- (unsigned long long)uID;
+- (void)setPhotos:(NSMutableArray *)photos;
+- (void)setTotalNumberOfPhotos:(unsigned int)totalNumberOfPhotos;
+@end
+
+@interface GEOPlace : PBCodable
+- (NSMutableArray *)business;
+@end
+
+@interface GEOPlaceResult : PBCodable
+- (GEOPlace *)place;
+@end
+
+@interface GEOPlaceSearchResponse : PBCodable
+- (NSMutableArray *)placeResults;
 @end
