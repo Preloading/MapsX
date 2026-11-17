@@ -9,3 +9,4 @@ Depiction: http://cydia.preloading.dev/depictions/mapsx/6.0/index.html
 Icon: file:///Library/Application%20Support/com.skyglow.mapsx/MapsX-Icon.png
 Section: Tweaks
 Depends: mobilesubstrate (>= 0.9.5000), firmware (>= 6.0)
+Recommends: com.skyglow.tlsfix

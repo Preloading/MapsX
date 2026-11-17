@@ -22,7 +22,8 @@ MapsX_FILES = Tweak.x \
 			polygons.xm \
 			landmark3d.xm \
 			directionmaps.x \
-			satellite.x
+			satellite.x \
+			photos.x
 
 MapsX_LIBRARIES = heif de265 c++
 MapsX_CFLAGS = -fobjc-arc -Wno-gcc-compat -Ilib/libheif/include
