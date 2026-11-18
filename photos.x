@@ -8,7 +8,7 @@ static NSMutableArray *muids = nil;
 - (unsigned long long)uID {
     unsigned long long orig = %orig;
     // NSLog(@"[MapsX] muid: %llu", orig);
-    [muids addObject:[NSString stringWithFormat:@"%llu", orig]];
+    if (orig) [muids addObject:[NSString stringWithFormat:@"%llu", orig]];
     return orig;
 }
 
