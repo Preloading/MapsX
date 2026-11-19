@@ -1,6 +1,14 @@
 #import <Foundation/Foundation.h>
 #import "GeoHeaders.h"
 
+@interface SearchResult : NSObject
+- (GEOPlace *)place;
+@end
+
+@interface InfoCardContentProvider : NSObject
+- (SearchResult *)searchResult;
+@end
+
 static NSMutableArray *muids = nil;
 
 %hook GEOBusiness
@@ -100,6 +108,17 @@ static NSMutableArray *muids = nil;
         }
     }
     return orig;
+}
+%end
+
+%hook InfoCardContentProvider
+
+- (BOOL)showsContentSwitchingControl {
+    BOOL orig = %orig;
+    if (orig) return orig;
+    GEOPlace *place = [[self searchResult] place];
+    if (![place businessCount]) return orig;
+    return [[place businessAtIndex:0] photosCount] > 0;
 }
 
 %end

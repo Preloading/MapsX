@@ -253,17 +253,19 @@
 
 @interface GEOPhoto : PBCodable
 - (void)setUid:(NSString *)uid;
-- (void)setPhotoType:(int)photoType;
 - (void)setPhotoInfos:(NSMutableArray *)photoInfos;
 @end
 
 @interface GEOBusiness : PBCodable
+- (unsigned int)photosCount;
 - (unsigned long long)uID;
 - (void)setPhotos:(NSMutableArray *)photos;
 - (void)setTotalNumberOfPhotos:(unsigned int)totalNumberOfPhotos;
 @end
 
 @interface GEOPlace : PBCodable
+- (unsigned int)businessCount;
+- (GEOBusiness *)businessAtIndex:(unsigned int)index;
 - (NSMutableArray *)business;
 @end
 
