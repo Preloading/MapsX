@@ -125,6 +125,7 @@ static NSString *lookedUpName = nil;
                                 if (!error) {
                                     // nice
                                     lookedUpName = waypointID.placeNameHint;
+                                    waypointID.placeNameHint = nil; // match original request just in case
                                     [waypointID writeTo:waypointId]; // crimes
                                 } else {
                                     NSLog(@"[MapsX] Failed to get more info for location: %@", error);
