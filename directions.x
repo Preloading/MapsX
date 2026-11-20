@@ -44,7 +44,7 @@
 
         [writer writeUint32:3 forTag:3];
 
-        PBCodable *currentUserLocation = [self valueForKey:@"_currentUserLocation"];
+        GEOLocation *currentUserLocation = [self valueForKey:@"_currentUserLocation"];
         if (currentUserLocation != nil) {
             PBDataWriter *dataWriter = [[PBDataWriter alloc] init];
             [currentUserLocation writeTo:dataWriter];
@@ -117,8 +117,9 @@
                             NSLog(@"[MapsX] search request %@", search);
                             if (currentMapRegion) { 
                                 NSLog(@"[MapsX] generating new data");
-                                GEOWaypointID *waypointID = [GEOWaypointID alloc];
+                                GEOWaypointID *waypointID = [[GEOWaypointID alloc] init];
                                 NSError *error = [GEOQueryToLatLng getQueryToLatLng:search region:currentMapRegion out:waypointID];
+                                NSLog(@"[MapsX] placeNameHint: %@ muid: %llu", waypointID.placeNameHint, waypointID.muid);
                                 if (!error) {
                                     // nice
                                     [waypointID writeTo:waypointId]; // crimes
