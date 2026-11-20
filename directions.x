@@ -5,6 +5,9 @@
 #import "GeoHeaders.h"
 #import "GEOQueryToLatLng.h"
 
+static NSMutableArray *waypointNames = nil;
+static NSString *lookedUpName = nil;
+
 %group EnableDirectionsPatch
 %hook GEODirectionsRequest
 
@@ -119,9 +122,9 @@
                                 NSLog(@"[MapsX] generating new data");
                                 GEOWaypointID *waypointID = [[GEOWaypointID alloc] init];
                                 NSError *error = [GEOQueryToLatLng getQueryToLatLng:search region:currentMapRegion out:waypointID];
-                                NSLog(@"[MapsX] placeNameHint: %@ muid: %llu", waypointID.placeNameHint, waypointID.muid);
                                 if (!error) {
                                     // nice
+                                    lookedUpName = waypointID.placeNameHint;
                                     [waypointID writeTo:waypointId]; // crimes
                                 } else {
                                     NSLog(@"[MapsX] Failed to get more info for location: %@", error);
@@ -161,6 +164,7 @@
             return [waypointWriter data];
         };
         
+        waypointNames = [NSMutableArray array];
         NSArray *waypoints = [self valueForKey:@"_waypoints"];
         NSFastEnumerationState state = {0};
         __unsafe_unretained id objects[16];
@@ -169,7 +173,9 @@
             do {
                 for (NSUInteger i = 0; i < count; i++) {
                     id waypoint = state.itemsPtr[i];
+                    lookedUpName = nil;
                     NSData *waypointData = writeWaypointAsTyped(waypoint);
+                    [waypointNames addObject:lookedUpName ?: [NSNull null]];
                     [writer writeData:waypointData forTag:22]; // waypointTyped
                 }
                 count = [waypoints countByEnumeratingWithState:&state objects:objects count:16];
@@ -198,6 +204,22 @@
     }
 }
 
+%end
+
+%hook GEODirectionsResponse
+
+// to fill in the name for the directions searches in lieu of "Arrive at the destination" and "Start on the route"
+- (BOOL)readFrom:(id)arg1 {
+    BOOL orig = %orig;
+    for (unsigned int index = 0; index < [self placeSearchResponsesCount] && index < waypointNames.count; index++) {
+        NSString *waypointName = waypointNames[index];
+        if (![waypointName isKindOfClass:[NSString class]]) continue;
+        for (GEOPlaceResult *placeResult in [[self placeSearchResponseAtIndex:index] placeResults]) {
+            [[[placeResult place] address] setFormattedAddressLines:[NSMutableArray arrayWithObject:waypointName]];
+        }
+    }
+    return orig;
+}
 %end
 %end
 
