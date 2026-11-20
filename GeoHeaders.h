@@ -133,6 +133,7 @@
         unsigned int formattedAddressType:1;
     } _has;
 }
+@property (nonatomic, retain) NSMutableArray *formattedAddressLines;
 @end
 
 // ouch
@@ -267,6 +268,7 @@
 - (unsigned int)businessCount;
 - (GEOBusiness *)businessAtIndex:(unsigned int)index;
 - (NSMutableArray *)business;
+- (GEOAddress *)address;
 @end
 
 @interface GEOPlaceResult : PBCodable
@@ -275,4 +277,9 @@
 
 @interface GEOPlaceSearchResponse : PBCodable
 - (NSMutableArray *)placeResults;
+@end
+
+@interface GEODirectionsResponse : PBCodable
+- (unsigned int)placeSearchResponsesCount;
+- (GEOPlaceSearchResponse *)placeSearchResponseAtIndex:(unsigned int)index;
 @end
