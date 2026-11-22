@@ -219,6 +219,7 @@ static NSString *lookedUpName = nil;
             [[[placeResult place] address] setFormattedAddressLines:[NSMutableArray arrayWithObject:waypointName]];
         }
     }
+    waypointNames = nil;
     return orig;
 }
 %end
