@@ -212,16 +212,17 @@ static NSString *lookedUpName = nil;
 // to fill in the name for the directions searches in lieu of "Arrive at the destination" and "Start on the route"
 - (BOOL)readFrom:(id)arg1 {
     BOOL orig = %orig;
-    for (unsigned int index = 0; index < [self placeSearchResponsesCount] && index < waypointNames.count; index++) {
-        NSString *waypointName = waypointNames[index];
+    for (unsigned int i = 0; i < [self placeSearchResponsesCount] && i < waypointNames.count; i++) {
+        NSString *waypointName = waypointNames[i];
         if (![waypointName isKindOfClass:[NSString class]]) continue;
-        for (GEOPlaceResult *placeResult in [[self placeSearchResponseAtIndex:index] placeResults]) {
+        for (GEOPlaceResult *placeResult in [[self placeSearchResponseAtIndex:i] placeResults]) {
             [[[placeResult place] address] setFormattedAddressLines:[NSMutableArray arrayWithObject:waypointName]];
         }
     }
     waypointNames = nil;
     return orig;
 }
+
 %end
 %end
 
