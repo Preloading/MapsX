@@ -1,9 +1,5 @@
 #import <Foundation/Foundation.h>
-
-@interface VKMapModel : NSObject
-- (int)mapType;
-- (void)forceMapType:(int)type;
-@end
+#import <CoreLocation/CoreLocation.h>
 
 @interface MNGuidanceSignsDisplay : NSObject
 - (void)setCurrentRoadDescription:(NSString *)description;
@@ -36,7 +32,7 @@
 - (VKAttributedRoute *)route;
 @end
 
-@interface MNLocation : NSObject
+@interface MNLocation : CLLocation
 - (VKAttributedRouteMatch *)routeMatch;
 - (BOOL)locationUnreliable;
 - (NSString *)roadName;
@@ -44,12 +40,33 @@
 
 @interface MNNavigator : NSObject
 - (MNLocation *)lastMatchedLocation;
+- (MNLocation *)lastTrackedLocation;
+- (id)uiDelegate;
 @end
 
 @interface MNNavViewController : NSObject
 - (MNGuidanceSignsDisplay *)guidanceDisplay;
 - (MNNavigator *)navigator;
+- (id)mapView;
 @end
+
+@interface NSObject (MapsX)
+- (void)resetUserLocation;
+- (id)worldView;
+- (int)userTrackingMode;
+- (void)setUserTrackingMode:(int)mode;
+- (void)_resetTracking:(BOOL)stopLocationUpdate;
+- (void)becomeCurrentContainerWithViews:(id)views animated:(BOOL)animated;
+- (void)forceSceneLoad;
+@end
+
+@interface SteppingMode : NSObject
+- (id)delegate;
+@end
+
+static id worldView = nil;
+static CLLocationCoordinate2D lastResetCoord;
+static BOOL hasLastResetCoord = NO;
 
 // the tile data doesn't usually carry a road name, so get it from the current route step instead
 static NSString *roadNameFromRouteStep(MNNavigator *navigator) {
@@ -95,11 +112,6 @@ static NSString *roadNameFromRouteStep(MNNavigator *navigator) {
     %orig;
 }
 
-- (void)activeTileGroupChanged:(id)arg { // to make it stay in the patched tiles even after driving out of the currently cached/loaded area
-    %orig;
-    [self forceMapType:[self mapType]];
-}
-
 %end
 
 %hook MNNavViewController
@@ -114,6 +126,54 @@ static NSString *roadNameFromRouteStep(MNNavigator *navigator) {
     MNGuidanceSignsDisplay *display = [self guidanceDisplay];
     [display setCurrentRoadDescription:roadName ?: @""];
     [display setCurrentRoadDescriptionIsUnreliable:unreliable];
+}
+
+- (void)becomeCurrentContainerWithViews:(id)arg1 animated:(BOOL)arg2 {
+    %orig;
+    id wv = [arg1 worldView];
+    worldView = wv;
+    int mode = [wv userTrackingMode];
+    [wv setUserTrackingMode:0];
+    [wv resetUserLocation];
+    [wv setUserTrackingMode:mode];
+    MNLocation *loc = [[self navigator] lastTrackedLocation];
+    if (loc) {
+        lastResetCoord = loc.coordinate;
+        hasLastResetCoord = YES;
+    } else hasLastResetCoord = NO;
+}
+
+%end
+
+%hook MNNavigator
+
+- (void)locationManagerUpdatedLocation:(id)arg1 {
+    %orig;
+    MNLocation *loc = [self lastTrackedLocation];
+    if (!loc) return;
+    if (hasLastResetCoord) {
+        CLLocation *last = [[CLLocation alloc] initWithLatitude:lastResetCoord.latitude longitude:lastResetCoord.longitude];
+        if ([loc distanceFromLocation:last] < 300) return;
+    }
+    lastResetCoord = loc.coordinate;
+    hasLastResetCoord = YES;
+    NSLog(@"[MapsX] MNNavigator locationManagerUpdatedLocation, forcing refresh");
+    id navVC = [self uiDelegate];
+    id mapView = [navVC mapView];
+    [mapView forceSceneLoad];
+}
+
+%end
+
+%hook SteppingMode
+
+- (void)becomeCurrentContainerWithViews:(id)arg1 animated:(BOOL)arg2 {
+    %orig;
+    id mapVC = [self delegate];
+    id wv = [mapVC worldView];
+    int mode = [wv userTrackingMode];
+    [mapVC _resetTracking:NO];
+    [wv setUserTrackingMode:mode];
 }
 
 %end
