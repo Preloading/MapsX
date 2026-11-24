@@ -25,12 +25,33 @@ static NSURL *(*signURL)(NSURL *url, NSString *token);
         NSString *xml = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         if (xml) {
             xml = [xml stringByReplacingOccurrencesOfString:@"key=\"USE_APPLE_DG\" value=\"dtm\"" withString:@"key=\"USE_APPLE_DG\" value=\"true\""];
-            NSRegularExpression *gridRegex = [NSRegularExpression regularExpressionWithPattern:@"<trigger region=\"8[0-9]{6}\"[^>]*></trigger>" options:0 error:nil];
+            NSRegularExpression *gridRegex = [NSRegularExpression regularExpressionWithPattern:@"<trigger region=\"8[0-9]{6}\"[^>]*(?:/>|></trigger>)" options:0 error:nil];
             xml = [gridRegex stringByReplacingMatchesInString:xml options:0 range:NSMakeRange(0, [xml length]) withTemplate:@""];
+            NSMutableString *triggers = [NSMutableString string];
+            NSString *regions = [NSString stringWithContentsOfFile:@"/private/var/mobile/Library/Caches/GeoServices/flyoverregions.txt" encoding:NSUTF8StringEncoding error:nil]; // doing the same kinda thing as the shield map
+            for (NSString *row in [regions componentsSeparatedByString:@"\n"]) {
+                NSArray *fields = [row componentsSeparatedByString:@","];
+                if ([fields count] < 7) continue;
+                NSRegularExpression *oldRegex = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"<trigger region=\"%@\"[^>]*(?:/>|></trigger>)", [fields objectAtIndex:0]] options:0 error:nil];
+                xml = [oldRegex stringByReplacingMatchesInString:xml options:0 range:NSMakeRange(0, [xml length]) withTemplate:@""];
+                [triggers appendFormat:@"<trigger region=\"%@\" altitude=\"%@\" latitude=\"%@\" longitude=\"%@\" level=\"13\" max_level=\"20\" name=\"%@\" priority=\"0\" radius=\"%@\" version=\"%@\"/>", [fields objectAtIndex:0], [fields objectAtIndex:1], [fields objectAtIndex:2], [fields objectAtIndex:3], [fields objectAtIndex:6], [fields objectAtIndex:4], [fields objectAtIndex:5]];
+            }
+            xml = [xml stringByReplacingOccurrencesOfString:@"</triggers>" withString:[triggers stringByAppendingString:@"</triggers>"]];
             return [xml dataUsingEncoding:NSUTF8StringEncoding];
         }
     }
     return data;
+}
+
+%end
+
+%hook GEOResourceManifestServer
+
+- (id)init {
+    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://repo.podpod123.com/tweakfiles/mapsx/flyoverregions.txt"] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:8.0] queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *body, NSError *error) {
+        if (body && [(NSHTTPURLResponse *)response statusCode] == 200 && [body length] > 0) [body writeToFile:@"/private/var/mobile/Library/Caches/GeoServices/flyoverregions.txt" atomically:YES];
+    }];
+    return %orig;
 }
 
 %end
