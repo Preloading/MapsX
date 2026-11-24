@@ -6,7 +6,7 @@
 @end
 
 void GEOTileKeyMake(uint32_t *key, unsigned x, unsigned y, unsigned z, unsigned type, unsigned pixelSize, unsigned textScale, unsigned provider, BOOL expires);
-static NSURL *(*signURL)(NSURL *url, NSString *token);
+static NSURL *(*signURL)(NSURL *url, NSString *token); // cause changing parameters breaks the signature, so re-sign it here
 
 %group AltitudePatches
 %hookf(void, GEOTileKeyMake, uint32_t *key, unsigned x, unsigned y, unsigned z, unsigned type, unsigned pixelSize, unsigned textScale, unsigned provider, BOOL expires) {
