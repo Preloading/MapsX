@@ -63,7 +63,7 @@
 -(void)loadShieldsOnline {
     NSLog(@"[MapsX] downloading latest shield info...");
     NSURL *url = [NSURL URLWithString:@"http://preloading.dev/tweaks/mapsx/shield_maps.dat"]; // no point in having this be HTTPS.
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:60.0];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:8.0];
     [request setHTTPMethod:@"GET"];
 
     self->_connection =
