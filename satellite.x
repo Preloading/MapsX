@@ -17,6 +17,34 @@ static NSURL *(*signURL)(NSURL *url, NSString *token); // cause changing paramet
     }
 }
 
+%hook GEOVoltaireSimple3DTileRequester
+
+- (unsigned)tileEditionForKey:(uint32_t *)key {
+    unsigned type = key[1] >> 26;
+    if (type >= 14 && type <= 16 && key[3] > 255) return [[GEOAltitudeManifest sharedManager] versionForRegion:key[3]];
+    return %orig;
+}
+
+- (id)urlForTileKey:(uint32_t *)key {
+    NSURL *url = %orig;
+    unsigned type = key[1] >> 26;
+    if (type < 14 || type > 16 || key[3] <= 255 || ![url isKindOfClass:[NSURL class]]) return url;
+    NSString *urlString = [url absoluteString];
+    NSRange signature = [urlString rangeOfString:@"sid="];
+    if (signature.location != NSNotFound && signature.location > 0) urlString = [urlString substringToIndex:signature.location - 1];
+    NSString *region = [NSString stringWithFormat:@"%u", key[3]];
+    NSString *version = [NSString stringWithFormat:@"%u", [[GEOAltitudeManifest sharedManager] versionForRegion:key[3]]];
+    NSRegularExpression *regionRegex = [NSRegularExpression regularExpressionWithPattern:@"(?<=[?&]region=)\\d+" options:0 error:nil];
+    NSRegularExpression *versionRegex = [NSRegularExpression regularExpressionWithPattern:@"(?<=[?&]v=)\\d+" options:0 error:nil];
+    urlString = [regionRegex stringByReplacingMatchesInString:urlString options:0 range:NSMakeRange(0, [urlString length]) withTemplate:region];
+    urlString = [versionRegex stringByReplacingMatchesInString:urlString options:0 range:NSMakeRange(0, [urlString length]) withTemplate:version];
+    return signURL([NSURL URLWithString:urlString], nil);
+}
+
+%end
+%end
+
+%group FlyoverRegions
 %hook GEOResourceManager
 
 - (NSData *)dataForResourceWithName:(NSString *)name fallbackBundle:(NSBundle *)bundle {
@@ -55,32 +83,6 @@ static NSURL *(*signURL)(NSURL *url, NSString *token); // cause changing paramet
 }
 
 %end
-
-%hook GEOVoltaireSimple3DTileRequester
-
-- (unsigned)tileEditionForKey:(uint32_t *)key {
-    unsigned type = key[1] >> 26;
-    if (type >= 14 && type <= 16 && key[3] > 255) return [[GEOAltitudeManifest sharedManager] versionForRegion:key[3]];
-    return %orig;
-}
-
-- (id)urlForTileKey:(uint32_t *)key {
-    NSURL *url = %orig;
-    unsigned type = key[1] >> 26;
-    if (type < 14 || type > 16 || key[3] <= 255 || ![url isKindOfClass:[NSURL class]]) return url;
-    NSString *urlString = [url absoluteString];
-    NSRange signature = [urlString rangeOfString:@"sid="];
-    if (signature.location != NSNotFound && signature.location > 0) urlString = [urlString substringToIndex:signature.location - 1];
-    NSString *region = [NSString stringWithFormat:@"%u", key[3]];
-    NSString *version = [NSString stringWithFormat:@"%u", [[GEOAltitudeManifest sharedManager] versionForRegion:key[3]]];
-    NSRegularExpression *regionRegex = [NSRegularExpression regularExpressionWithPattern:@"(?<=[?&]region=)\\d+" options:0 error:nil];
-    NSRegularExpression *versionRegex = [NSRegularExpression regularExpressionWithPattern:@"(?<=[?&]v=)\\d+" options:0 error:nil];
-    urlString = [regionRegex stringByReplacingMatchesInString:urlString options:0 range:NSMakeRange(0, [urlString length]) withTemplate:region];
-    urlString = [versionRegex stringByReplacingMatchesInString:urlString options:0 range:NSMakeRange(0, [urlString length]) withTemplate:version];
-    return signURL([NSURL URLWithString:urlString], nil);
-}
-
-%end
 %end
 
 %ctor {
@@ -88,4 +90,5 @@ static NSURL *(*signURL)(NSURL *url, NSString *token); // cause changing paramet
         signURL = (NSURL *(*)(NSURL *, NSString *))MSFindSymbol(NULL, "_GEOURLAuthenticationGenerateURL");
         %init(AltitudePatches);
     }
+    %init(FlyoverRegions);
 }
