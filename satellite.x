@@ -76,10 +76,17 @@ static NSURL *(*signURL)(NSURL *url, NSString *token); // cause changing paramet
 %hook GEOResourceManifestServer
 
 - (id)init {
-    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://repo.podpod123.com/tweakfiles/mapsx/flyoverregions.txt"] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:8.0] queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *body, NSError *error) {
+    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://repo.podpod123.com/tweakfiles/mapsx/flyoverregions.txt"] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:7.0] queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *body, NSError *error) {
         if (body && [(NSHTTPURLResponse *)response statusCode] == 200 && [body length] > 0) [body writeToFile:@"/private/var/mobile/Library/Caches/GeoServices/flyoverregions.txt" atomically:YES];
     }];
     return %orig;
+}
+
+- (void)serverProxyDidChangeActiveTileGroup:(id)group finishedCallback:(id)callback {
+    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://repo.podpod123.com/tweakfiles/mapsx/flyoverregions.txt"] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:7.0] queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *body, NSError *error) {
+        if (body && [(NSHTTPURLResponse *)response statusCode] == 200 && [body length] > 0) [body writeToFile:@"/private/var/mobile/Library/Caches/GeoServices/flyoverregions.txt" atomically:YES];
+        %orig(group, callback);
+    }];
 }
 
 %end
