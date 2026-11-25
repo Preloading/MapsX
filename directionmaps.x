@@ -55,17 +55,11 @@
 - (id)worldView;
 - (int)userTrackingMode;
 - (void)setUserTrackingMode:(int)mode;
-- (void)_resetTracking:(BOOL)stopLocationUpdate;
-- (void)becomeCurrentContainerWithViews:(id)views animated:(BOOL)animated;
 - (void)forceSceneLoad;
 @end
 
-@interface SteppingMode : NSObject
-- (id)delegate;
-@end
-
-static id worldView = nil;
-static CLLocationCoordinate2D lastResetCoord;
+static id worldView = nil; // cached worldView from the last MNNavViewController transition
+static CLLocationCoordinate2D lastResetCoord; // last spot where a tile refresh was forced, so we can track distance rather than re-drawing on every new gps update
 static BOOL hasLastResetCoord = NO;
 
 // the tile data doesn't usually carry a road name, so get it from the current route step instead
@@ -128,7 +122,7 @@ static NSString *roadNameFromRouteStep(MNNavigator *navigator) {
     [display setCurrentRoadDescriptionIsUnreliable:unreliable];
 }
 
-- (void)becomeCurrentContainerWithViews:(id)arg1 animated:(BOOL)arg2 {
+- (void)becomeCurrentContainerWithViews:(id)arg1 animated:(BOOL)arg2 { // this is called when navigation is started and when the Resume button is tapped in route overview. hooking this to basically simulate a resume press.
     %orig;
     id wv = [arg1 worldView];
     worldView = wv;
@@ -147,33 +141,20 @@ static NSString *roadNameFromRouteStep(MNNavigator *navigator) {
 
 %hook MNNavigator
 
-- (void)locationManagerUpdatedLocation:(id)arg1 {
+- (void)locationManagerUpdatedLocation:(id)arg1 { // called on every gps update during navigation, useful
     %orig;
     MNLocation *loc = [self lastTrackedLocation];
     if (!loc) return;
     if (hasLastResetCoord) {
         CLLocation *last = [[CLLocation alloc] initWithLatitude:lastResetCoord.latitude longitude:lastResetCoord.longitude];
-        if ([loc distanceFromLocation:last] < 300) return;
+        if ([loc distanceFromLocation:last] < 300) return; // only do it on every approximately 300m, so it doesn't stutter and lag the ui constantly
     }
     lastResetCoord = loc.coordinate;
     hasLastResetCoord = YES;
     NSLog(@"[MapsX] MNNavigator locationManagerUpdatedLocation, forcing refresh");
     id navVC = [self uiDelegate];
     id mapView = [navVC mapView];
-    [mapView forceSceneLoad];
-}
-
-%end
-
-%hook SteppingMode
-
-- (void)becomeCurrentContainerWithViews:(id)arg1 animated:(BOOL)arg2 {
-    %orig;
-    id mapVC = [self delegate];
-    id wv = [mapVC worldView];
-    int mode = [wv userTrackingMode];
-    [mapVC _resetTracking:NO];
-    [wv setUserTrackingMode:mode];
+    [mapView forceSceneLoad]; // vkmapview's tile reload function, this is called to remake the tiles when there's a blank grid
 }
 
 %end
