@@ -56,6 +56,11 @@
 - (int)userTrackingMode;
 - (void)setUserTrackingMode:(int)mode;
 - (void)forceSceneLoad;
+- (void)_resetTracking:(BOOL)stopLocationUpdate;
+@end
+
+@interface SteppingMode : NSObject
+- (id)delegate;
 @end
 
 static id worldView = nil; // cached worldView from the last MNNavViewController transition
@@ -158,10 +163,24 @@ static NSString *roadNameFromRouteStep(MNNavigator *navigator) {
 }
 
 %end
+
+%hook SteppingMode
+
+- (void)becomeCurrentContainerWithViews:(id)arg1 animated:(BOOL)arg2 { // originally removed cause i thought it was dead code. but i realized both this and the MNNavigator stuff is needed for it to work.
+    %orig;
+    id mapVC = [self delegate];
+    id wv = [mapVC worldView];
+    int mode = [wv userTrackingMode];
+    [mapVC _resetTracking:NO];
+    [wv setUserTrackingMode:mode];
+}
+
+%end
 %end
 
 %ctor {
     if (kCFCoreFoundationVersionNumber < 847.20) { // apply only to ios 6 cause it's half-assed on ios 7
         %init(DrivingViewPatches);
     }
+    // %init(DrivingViewPatches);
 }
