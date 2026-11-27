@@ -49,6 +49,7 @@
 
 @interface NSObject (MapsX)
 - (id)createSourceForLayer:(unsigned int)layer tileSet:(id)tileSet mode:(int)mode;
+- (void)drawScene:(id)scene withContext:(id)context;
 @end
 
 @interface VKTileProvider : NSObject
@@ -60,6 +61,7 @@ static id polygonTileSet = nil;
 static id roadTileSet = nil;
 static id navProvider = nil;
 static id navSource = nil;
+static id roadModel = nil;
 
 // the tile data doesn't usually carry a road name, so get it from the current route step instead
 static NSString *roadNameFromRouteStep(MNNavigator *navigator) {
@@ -128,6 +130,24 @@ static NSString *roadNameFromRouteStep(MNNavigator *navigator) {
     id roadSource = roadTileSet ? [mapModel createSourceForLayer:1024 tileSet:roadTileSet mode:0] : nil;
     if (polygonSource) [self setTileSource:polygonSource forMapLayer:512 optional:NO];
     if (roadSource) [self setTileSource:roadSource forMapLayer:1024 optional:NO];
+}
+
+%end
+
+%hook VKRoadMapModel
+
+- (void)drawScene:(id)scene withContext:(id)context {
+    roadModel = self;
+    %orig;
+}
+
+%end
+
+%hook VKRealisticMapModel
+
+- (void)drawScene:(id)scene withContext:(id)context {
+    if (roadModel) [roadModel drawScene:scene withContext:context];
+    %orig;
 }
 
 %end
