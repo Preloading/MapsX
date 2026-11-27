@@ -83,9 +83,10 @@ static NSURL *(*signURL)(NSURL *url, NSString *token); // cause changing paramet
 }
 
 - (void)serverProxyDidChangeActiveTileGroup:(id)group finishedCallback:(id)callback {
+    id callbackCopy = [callback copy]; // to work around a segmentation fault on geod. because it's async, it was calling orig after the memory was reclaimed. copy to heap first.
     [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://repo.podpod123.com/tweakfiles/mapsx/flyoverregions.txt"] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:7.0] queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *body, NSError *error) {
         if (body && [(NSHTTPURLResponse *)response statusCode] == 200 && [body length] > 0) [body writeToFile:@"/private/var/mobile/Library/Caches/GeoServices/flyoverregions.txt" atomically:YES];
-        %orig(group, callback);
+        %orig(group, callbackCopy);
     }];
 }
 
