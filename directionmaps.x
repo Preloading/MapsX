@@ -47,9 +47,6 @@
 - (MNNavigator *)navigator;
 @end
 
-@interface VKMapModel : NSObject
-@end
-
 // the tile data doesn't usually carry a road name, so get it from the current route step instead
 static NSString *roadNameFromRouteStep(MNNavigator *navigator) {
     VKAttributedRouteMatch *match = [[navigator lastMatchedLocation] routeMatch];
@@ -94,15 +91,12 @@ static NSString *roadNameFromRouteStep(MNNavigator *navigator) {
     %orig;
 }
 
-- (void)setDesiredMapMode:(int)mode immediate:(BOOL)immediate {
-    %orig(mode == 1 ? 0 : mode, immediate); // mode 1 is the realistic tiles, which is bad!! keep it on mode 0, the regular standard tiles.
-}
+%end
 
-- (void)_tryTransitionAndPreloadIfNecessary:(id)context { // same thing here, but for when the camera zooms in
-    [self setValue:@NO forKey:@"dynamicMapModesEnabled"];
-    [self setValue:@NO forKey:@"debugDynamicMapModesEnabled"];
-    if ([[self valueForKey:@"desiredMapMode"] intValue] == 1) [self setValue:@0 forKey:@"desiredMapMode"];
-    %orig;
+%hook VKTileProvider
+
+- (void)setTileSource:(id)source forMapLayer:(unsigned int)layer optional:(BOOL)optional {
+    %orig(source, layer, layer == 2048 ? YES : optional); // make 2048 optional cause its the realistic layer, no longer on the server. a tile won't show at all until all the required layers have loaded in.
 }
 
 %end
