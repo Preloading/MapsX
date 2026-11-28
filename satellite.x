@@ -5,6 +5,14 @@
 - (unsigned)versionForRegion:(unsigned)region;
 @end
 
+@interface _GEOResourceInfo : NSObject
+- (NSString *)name;
+@end
+
+@interface GEOResourceInfo : NSObject
+- (NSString *)name;
+@end
+
 void GEOTileKeyMake(uint32_t *key, unsigned x, unsigned y, unsigned z, unsigned type, unsigned pixelSize, unsigned textScale, unsigned provider, BOOL expires);
 static NSURL *(*signURL)(NSURL *url, NSString *token); // cause changing parameters breaks the signature, so re-sign it here
 
@@ -45,33 +53,27 @@ static NSURL *(*signURL)(NSURL *url, NSString *token); // cause changing paramet
 %end
 
 %group FlyoverRegions
-%hook GEOResourceManager
+// iOS 6
+%hook _GEOResourceInfo
 
-- (NSData *)dataForResourceWithName:(NSString *)name fallbackBundle:(NSBundle *)bundle {
-    if ([name isEqualToString:@"altitude.xml"]) {
-        NSData *data = [NSData dataWithContentsOfFile:@"/private/var/mobile/Library/Caches/GeoServices/altitude-mapsx.xml"];
-        if (data) return data;
-    }
-    return %orig;
+- (NSURL *)url {
+    if ([[self name] hasPrefix:@"altitude"] && [[self name] hasSuffix:@".xml"]) return [NSURL URLWithString:@"http://repo.podpod123.com/tweakfiles/mapsx/altitude.xml"];
+    return %orig; 
 }
 
 %end
 
-%hook GEOResourceManifestServer
+// iOS 7+
+%hook GEOResourceInfo
 
-- (id)init {
-    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://repo.podpod123.com/tweakfiles/mapsx/altitude.xml"] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:7.0] queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *body, NSError *error) {
-        if (body && [(NSHTTPURLResponse *)response statusCode] == 200 && [body length] > 0) [body writeToFile:@"/private/var/mobile/Library/Caches/GeoServices/altitude-mapsx.xml" atomically:YES];
-    }];
+- (NSURL *)url {
+    if ([[self name] hasPrefix:@"altitude"] && [[self name] hasSuffix:@".xml"]) return [NSURL URLWithString:@"http://repo.podpod123.com/tweakfiles/mapsx/altitude.xml"];
     return %orig;
 }
 
-- (void)serverProxyDidChangeActiveTileGroup:(id)group finishedCallback:(id)callback {
-    id callbackCopy = [callback copy]; // to work around a segmentation fault on geod. because it's async, it was calling orig after the memory was reclaimed. copy to heap first.
-    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://repo.podpod123.com/tweakfiles/mapsx/altitude.xml"] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:7.0] queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *body, NSError *error) {
-        if (body && [(NSHTTPURLResponse *)response statusCode] == 200 && [body length] > 0) [body writeToFile:@"/private/var/mobile/Library/Caches/GeoServices/altitude-mapsx.xml" atomically:YES];
-        %orig(group, callbackCopy);
-    }];
+- (id)checksum {
+    if ([[self name] hasPrefix:@"altitude"] && [[self name] hasSuffix:@".xml"]) return nil;
+    return %orig;
 }
 
 %end
