@@ -1,5 +1,4 @@
 #import <Foundation/Foundation.h>
-#import <CoreLocation/CoreLocation.h>
 
 @interface MNGuidanceSignsDisplay : NSObject
 - (void)setCurrentRoadDescription:(NSString *)description;
@@ -32,10 +31,8 @@
 - (VKAttributedRoute *)route;
 @end
 
-@interface MNLocation : CLLocation
+@interface MNLocation : NSObject
 - (VKAttributedRouteMatch *)routeMatch;
-- (BOOL)locationUnreliable;
-- (NSString *)roadName;
 @end
 
 @interface MNNavigator : NSObject
