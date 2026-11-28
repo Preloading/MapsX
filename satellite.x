@@ -1,6 +1,17 @@
 #import <Foundation/Foundation.h>
 
-typedef uint32_t GEOTileKey;
+typedef struct {
+    unsigned z : 6;
+    unsigned x : 26;
+    unsigned y : 26;
+    unsigned type : 6;
+    unsigned pixelSize : 8;
+    unsigned textScale : 8;
+    unsigned provider : 8;
+    unsigned expires : 1;
+    unsigned reserved : 7;
+    unsigned region;
+} GEOTileKey;
 
 @interface GEOAltitudeManifest : NSObject
 + (id)sharedManager;
@@ -26,27 +37,25 @@ static NSURL *(*signURL)(NSURL *url, NSString *token); // cause changing paramet
 %hookf(void, GEOTileKeyMake, GEOTileKey *key, unsigned x, unsigned y, unsigned z, unsigned type, unsigned pixelSize, unsigned textScale, unsigned provider, BOOL expires) {
     %orig;
     if (type >= 14 && type <= 16) {
-        key[3] = pixelSize;
-        if (type == 14) key[1] = (key[1] & 4227858432u) | ((pixelSize >> 8) & 67108863u);
+        key->region = pixelSize;
+        if (type == 14) key->y = pixelSize >> 8;
     }
 }
 
 %hook GEOVoltaireSimple3DTileRequester
 
 - (unsigned)tileEditionForKey:(GEOTileKey *)key {
-    unsigned type = key[1] >> 26;
-    if (type >= 14 && type <= 16 && key[3] > 255) return [[GEOAltitudeManifest sharedManager] versionForRegion:key[3]];
+    if (key->type >= 14 && key->type <= 16 && key->region > 255) return [[GEOAltitudeManifest sharedManager] versionForRegion:key->region];
     return %orig;
 }
 
 - (id)urlForTileKey:(GEOTileKey *)key {
-    unsigned type = key[1] >> 26;
-    if (type < 14 || type > 16 || key[3] <= 255) return %orig;
-    unsigned version = [[GEOAltitudeManifest sharedManager] versionForRegion:key[3]];
+    if (key->type < 14 || key->type > 16 || key->region <= 255) return %orig;
+    unsigned version = [[GEOAltitudeManifest sharedManager] versionForRegion:key->region];
     NSString *query;
-    if (type == 14) query = [NSString stringWithFormat:@"style=14&v=%u&part=%u&region=%u", version, key[0] >> 6, key[3]];
-    else if (type == 15) query = [NSString stringWithFormat:@"style=15&v=%u&region=%u&x=%u&y=%u&z=%u&h=%u", version, key[3], key[0] >> 6, key[1] & 67108863u, key[0] & 63, (key[2] >> 8) & 255];
-    else if (type == 16) query = [NSString stringWithFormat:@"style=16&v=%u&region=%u&x=%u&y=%u&z=%u", version, key[3], key[0] >> 6, key[1] & 67108863u, key[0] & 63];
+    if (key->type == 14) query = [NSString stringWithFormat:@"style=14&v=%u&part=%u&region=%u", version, key->x, key->region];
+    else if (key->type == 15) query = [NSString stringWithFormat:@"style=15&v=%u&region=%u&x=%u&y=%u&z=%u&h=%u", version, key->region, key->x, key->y, key->z, key->textScale];
+    else if (key->type == 16) query = [NSString stringWithFormat:@"style=16&v=%u&region=%u&x=%u&y=%u&z=%u", version, key->region, key->x, key->y, key->z];
     NSString *base = [self _baseURLStringForTileKey:key];
     if (!base) return nil;
     NSString *separator = [base rangeOfString:@"?"].location != NSNotFound ? @"&" : @"?";
