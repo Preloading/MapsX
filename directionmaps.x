@@ -47,21 +47,8 @@
 - (MNNavigator *)navigator;
 @end
 
-@interface NSObject (MapsX)
-- (id)createSourceForLayer:(unsigned int)layer tileSet:(id)tileSet mode:(int)mode;
-- (void)drawScene:(id)scene withContext:(id)context;
+@interface VKMapModel : NSObject
 @end
-
-@interface VKTileProvider : NSObject
-- (void)setTileSource:(id)source forMapLayer:(unsigned int)layer optional:(BOOL)optional;
-@end
-
-static id mapModel = nil;
-static id polygonTileSet = nil;
-static id roadTileSet = nil;
-static id navProvider = nil;
-static id navSource = nil;
-static id roadModel = nil;
 
 // the tile data doesn't usually carry a road name, so get it from the current route step instead
 static NSString *roadNameFromRouteStep(MNNavigator *navigator) {
@@ -107,46 +94,14 @@ static NSString *roadNameFromRouteStep(MNNavigator *navigator) {
     %orig;
 }
 
-- (id)createSourceForLayer:(unsigned int)layer tileSet:(id)tileSet mode:(int)mode {
-    mapModel = self;
-    if (mode == 0 && tileSet) {
-        if (layer == 512) polygonTileSet = tileSet;
-        if (layer == 1024) roadTileSet = tileSet;
-    }
-    return %orig;
+- (void)setDesiredMapMode:(int)mode immediate:(BOOL)immediate {
+    %orig(mode == 1 ? 0 : mode, immediate); // mode 1 is the realistic tiles, which is bad!! keep it on mode 0, the regular standard tiles.
 }
 
-%end
-
-%hook VKTileProvider
-
-- (void)setTileSource:(id)source forMapLayer:(unsigned int)layer optional:(BOOL)optional {
-    %orig;
-    if (layer == 2048 && !source && self == navProvider) navSource = nil;
-    if (layer != 2048 || !source || !mapModel) return;
-    navProvider = self;
-    navSource = source;
-    id polygonSource = polygonTileSet ? [mapModel createSourceForLayer:512 tileSet:polygonTileSet mode:0] : nil;
-    id roadSource = roadTileSet ? [mapModel createSourceForLayer:1024 tileSet:roadTileSet mode:0] : nil;
-    if (polygonSource) [self setTileSource:polygonSource forMapLayer:512 optional:NO];
-    if (roadSource) [self setTileSource:roadSource forMapLayer:1024 optional:NO];
-}
-
-%end
-
-%hook VKRoadMapModel
-
-- (void)drawScene:(id)scene withContext:(id)context {
-    roadModel = self;
-    %orig;
-}
-
-%end
-
-%hook VKRealisticMapModel
-
-- (void)drawScene:(id)scene withContext:(id)context {
-    if (roadModel) [roadModel drawScene:scene withContext:context];
+- (void)_tryTransitionAndPreloadIfNecessary:(id)context { // same thing here, but for when the camera zooms in
+    [self setValue:@NO forKey:@"dynamicMapModesEnabled"];
+    [self setValue:@NO forKey:@"debugDynamicMapModesEnabled"];
+    if ([[self valueForKey:@"desiredMapMode"] intValue] == 1) [self setValue:@0 forKey:@"desiredMapMode"];
     %orig;
 }
 
@@ -173,5 +128,4 @@ static NSString *roadNameFromRouteStep(MNNavigator *navigator) {
     if (kCFCoreFoundationVersionNumber < 847.20) { // apply only to ios 6 cause it's half-assed on ios 7
         %init(DrivingViewPatches);
     }
-    // %init(DrivingViewPatches);
 }
