@@ -95,6 +95,7 @@ NSString *URLPatches(NSString *baseURL) {
             return value;
         }
     }
+    else if ([key isEqualToString:@"GEOVoltaireETAURL"]) return @"https://gsp-ssl.ls.apple.com/directions.arpc";
     return %orig;
 }
 
