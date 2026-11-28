@@ -1,10 +1,5 @@
 #import <Foundation/Foundation.h>
 
-@interface VKMapModel : NSObject
-- (int)mapType;
-- (void)forceMapType:(int)type;
-@end
-
 @interface MNGuidanceSignsDisplay : NSObject
 - (void)setCurrentRoadDescription:(NSString *)description;
 - (void)setCurrentRoadDescriptionIsUnreliable:(BOOL)unreliable;
@@ -38,8 +33,6 @@
 
 @interface MNLocation : NSObject
 - (VKAttributedRouteMatch *)routeMatch;
-- (BOOL)locationUnreliable;
-- (NSString *)roadName;
 @end
 
 @interface MNNavigator : NSObject
@@ -95,9 +88,12 @@ static NSString *roadNameFromRouteStep(MNNavigator *navigator) {
     %orig;
 }
 
-- (void)activeTileGroupChanged:(id)arg { // to make it stay in the patched tiles even after driving out of the currently cached/loaded area
-    %orig;
-    [self forceMapType:[self mapType]];
+%end
+
+%hook VKTileProvider
+
+- (void)setTileSource:(id)source forMapLayer:(unsigned int)layer optional:(BOOL)optional {
+    %orig(source, layer, layer == 2048 ? YES : optional); // make 2048 optional cause its the realistic layer, no longer on the server. a tile won't show at all until all the required layers have loaded in.
 }
 
 %end
