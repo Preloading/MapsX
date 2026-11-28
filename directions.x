@@ -5,6 +5,9 @@
 #import "GeoHeaders.h"
 #import "GEOQueryToLatLng.h"
 
+static NSMutableArray *waypointNames = nil;
+static NSString *lookedUpName = nil;
+
 %group EnableDirectionsPatch
 %hook GEODirectionsRequest
 
@@ -44,7 +47,7 @@
 
         [writer writeUint32:3 forTag:3];
 
-        PBCodable *currentUserLocation = [self valueForKey:@"_currentUserLocation"];
+        GEOLocation *currentUserLocation = [self valueForKey:@"_currentUserLocation"];
         if (currentUserLocation != nil) {
             PBDataWriter *dataWriter = [[PBDataWriter alloc] init];
             [currentUserLocation writeTo:dataWriter];
@@ -117,10 +120,12 @@
                             NSLog(@"[MapsX] search request %@", search);
                             if (currentMapRegion) { 
                                 NSLog(@"[MapsX] generating new data");
-                                GEOWaypointID *waypointID = [GEOWaypointID alloc];
+                                GEOWaypointID *waypointID = [[GEOWaypointID alloc] init];
                                 NSError *error = [GEOQueryToLatLng getQueryToLatLng:search region:currentMapRegion out:waypointID];
                                 if (!error) {
                                     // nice
+                                    lookedUpName = waypointID.placeNameHint;
+                                    waypointID.placeNameHint = nil; // match original request just in case
                                     [waypointID writeTo:waypointId]; // crimes
                                 } else {
                                     NSLog(@"[MapsX] Failed to get more info for location: %@", error);
@@ -160,6 +165,7 @@
             return [waypointWriter data];
         };
         
+        waypointNames = [NSMutableArray array];
         NSArray *waypoints = [self valueForKey:@"_waypoints"];
         NSFastEnumerationState state = {0};
         __unsafe_unretained id objects[16];
@@ -168,7 +174,9 @@
             do {
                 for (NSUInteger i = 0; i < count; i++) {
                     id waypoint = state.itemsPtr[i];
+                    lookedUpName = nil;
                     NSData *waypointData = writeWaypointAsTyped(waypoint);
+                    [waypointNames addObject:lookedUpName ?: [NSNull null]];
                     [writer writeData:waypointData forTag:22]; // waypointTyped
                 }
                 count = [waypoints countByEnumeratingWithState:&state objects:objects count:16];
@@ -195,6 +203,24 @@
     } else {
         return %orig;
     }
+}
+
+%end
+
+%hook GEODirectionsResponse
+
+// to fill in the name for the directions searches in lieu of "Arrive at the destination" and "Start on the route"
+- (BOOL)readFrom:(id)arg1 {
+    BOOL orig = %orig;
+    for (unsigned int i = 0; i < [self placeSearchResponsesCount] && i < waypointNames.count; i++) {
+        NSString *waypointName = waypointNames[i];
+        if (![waypointName isKindOfClass:[NSString class]]) continue;
+        for (GEOPlaceResult *placeResult in [[self placeSearchResponseAtIndex:i] placeResults]) {
+            [[[placeResult place] address] setFormattedAddressLines:[NSMutableArray arrayWithObject:waypointName]];
+        }
+    }
+    waypointNames = nil;
+    return orig;
 }
 
 %end

@@ -8,6 +8,7 @@
 #import "GEOTokenManager.h"
 #import "GEOQueryToLatLng.h"
 #import "GeoHeaders.h"
+#import <CoreLocation/CoreLocation.h>
 
 // Custom URL decoding function, i duplicated this because im tired
 NSString *customURLDecode(NSString *string) {
@@ -78,7 +79,9 @@ NSString *customURLEncode(NSString *string) {
 @implementation GEOQueryToLatLng
 
 +(NSError*)getQueryToLatLng:(NSString*)query region:(GEOMapRegion*)currentMapRegion out:(GEOWaypointID*)output{
-    NSString *queryURL = [NSString stringWithFormat:@"https://api.apple-mapkit.com/v1/search?q=%@&searchRegion=%f,%f,%f,%f", customURLEncode(query), currentMapRegion.northLat, currentMapRegion.eastLng, currentMapRegion.southLat, currentMapRegion.westLng];
+    NSMutableString *queryURL = [NSMutableString stringWithFormat:@"https://api.apple-mapkit.com/v1/search?q=%@&searchRegion=%f,%f,%f,%f", customURLEncode(query), currentMapRegion.northLat, currentMapRegion.eastLng, currentMapRegion.southLat, currentMapRegion.westLng];
+    CLLocation *userLocation = [[[CLLocationManager alloc] init] location];
+    if (userLocation) [queryURL appendFormat:@"&userLocation=%f,%f", userLocation.coordinate.latitude, userLocation.coordinate.longitude];
     NSString *token = [[GEOTokenManager sharedManager] currentAccessToken];
     
     // make request
@@ -130,6 +133,9 @@ NSString *customURLEncode(NSString *string) {
                     [locationHint setValue:locationInfo[@"lat"] forKey:@"_lat"];
                     [locationHint setValue:locationInfo[@"lng"] forKey:@"_lng"];
                     output.locationHint = locationHint;
+                }
+                if ([mapPlace[@"name"] isKindOfClass:[NSString class]]) {
+                    output.placeNameHint = mapPlace[@"name"];
                 }
                 
                 // address lines
