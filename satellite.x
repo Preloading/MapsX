@@ -48,27 +48,11 @@ static NSURL *(*signURL)(NSURL *url, NSString *token); // cause changing paramet
 %hook GEOResourceManager
 
 - (NSData *)dataForResourceWithName:(NSString *)name fallbackBundle:(NSBundle *)bundle {
-    NSData *data = %orig(name, bundle);
-    if ([name isEqualToString:@"altitude.xml"] && [data isKindOfClass:[NSData class]]) {
-        NSString *xml = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        if (xml) {
-            xml = [xml stringByReplacingOccurrencesOfString:@"key=\"USE_APPLE_DG\" value=\"dtm\"" withString:@"key=\"USE_APPLE_DG\" value=\"true\""];
-            NSRegularExpression *gridRegex = [NSRegularExpression regularExpressionWithPattern:@"<trigger region=\"8[0-9]{6}\"[^>]*(?:/>|></trigger>)" options:0 error:nil];
-            xml = [gridRegex stringByReplacingMatchesInString:xml options:0 range:NSMakeRange(0, [xml length]) withTemplate:@""];
-            NSMutableString *triggers = [NSMutableString string];
-            NSString *regions = [NSString stringWithContentsOfFile:@"/private/var/mobile/Library/Caches/GeoServices/flyoverregions.txt" encoding:NSUTF8StringEncoding error:nil]; // doing the same kinda thing as the shield map
-            for (NSString *row in [regions componentsSeparatedByString:@"\n"]) {
-                NSArray *fields = [row componentsSeparatedByString:@","];
-                if ([fields count] < 7) continue;
-                NSRegularExpression *oldRegex = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"<trigger region=\"%@\"[^>]*(?:/>|></trigger>)", [fields objectAtIndex:0]] options:0 error:nil];
-                xml = [oldRegex stringByReplacingMatchesInString:xml options:0 range:NSMakeRange(0, [xml length]) withTemplate:@""];
-                [triggers appendFormat:@"<trigger region=\"%@\" altitude=\"%@\" latitude=\"%@\" longitude=\"%@\" level=\"13\" max_level=\"20\" name=\"%@\" priority=\"0\" radius=\"%@\" version=\"%@\"/>", [fields objectAtIndex:0], [fields objectAtIndex:1], [fields objectAtIndex:2], [fields objectAtIndex:3], [fields objectAtIndex:6], [fields objectAtIndex:4], [fields objectAtIndex:5]];
-            }
-            xml = [xml stringByReplacingOccurrencesOfString:@"</triggers>" withString:[triggers stringByAppendingString:@"</triggers>"]];
-            return [xml dataUsingEncoding:NSUTF8StringEncoding];
-        }
+    if ([name isEqualToString:@"altitude.xml"]) {
+        NSData *data = [NSData dataWithContentsOfFile:@"/private/var/mobile/Library/Caches/GeoServices/altitude-mapsx.xml"];
+        if (data) return data;
     }
-    return data;
+    return %orig;
 }
 
 %end
@@ -76,16 +60,16 @@ static NSURL *(*signURL)(NSURL *url, NSString *token); // cause changing paramet
 %hook GEOResourceManifestServer
 
 - (id)init {
-    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://repo.podpod123.com/tweakfiles/mapsx/flyoverregions.txt"] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:7.0] queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *body, NSError *error) {
-        if (body && [(NSHTTPURLResponse *)response statusCode] == 200 && [body length] > 0) [body writeToFile:@"/private/var/mobile/Library/Caches/GeoServices/flyoverregions.txt" atomically:YES];
+    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://repo.podpod123.com/tweakfiles/mapsx/altitude.xml"] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:7.0] queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *body, NSError *error) {
+        if (body && [(NSHTTPURLResponse *)response statusCode] == 200 && [body length] > 0) [body writeToFile:@"/private/var/mobile/Library/Caches/GeoServices/altitude-mapsx.xml" atomically:YES];
     }];
     return %orig;
 }
 
 - (void)serverProxyDidChangeActiveTileGroup:(id)group finishedCallback:(id)callback {
     id callbackCopy = [callback copy]; // to work around a segmentation fault on geod. because it's async, it was calling orig after the memory was reclaimed. copy to heap first.
-    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://repo.podpod123.com/tweakfiles/mapsx/flyoverregions.txt"] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:7.0] queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *body, NSError *error) {
-        if (body && [(NSHTTPURLResponse *)response statusCode] == 200 && [body length] > 0) [body writeToFile:@"/private/var/mobile/Library/Caches/GeoServices/flyoverregions.txt" atomically:YES];
+    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://repo.podpod123.com/tweakfiles/mapsx/altitude.xml"] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:7.0] queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *body, NSError *error) {
+        if (body && [(NSHTTPURLResponse *)response statusCode] == 200 && [body length] > 0) [body writeToFile:@"/private/var/mobile/Library/Caches/GeoServices/altitude-mapsx.xml" atomically:YES];
         %orig(group, callbackCopy);
     }];
 }
